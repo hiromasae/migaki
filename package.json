@@ -1,0 +1,13 @@
+{
+  "name": "migaki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Root manifest so Railway's Railpack builder detects a Node.js app while the whole repo — including taste/ — is deployed. The server itself lives in mcp-server/.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "cd mcp-server && npm install && npm run build",
+    "start": "cd mcp-server && npm start"
+  }
+}
