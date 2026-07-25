@@ -123,6 +123,24 @@ const FRAMEWORKS: readonly Match[] = [
   ["vue", "Vue"], ["solid-js", "Solid"], ["react", "React"],
 ];
 
+/**
+ * Framework signals that are visible in filenames alone. These carry the whole
+ * detection in tree mode, where dependency manifests cannot be read.
+ */
+const FRAMEWORK_MARKERS: readonly (readonly [pattern: RegExp, label: string])[] = [
+  [/(^|\/)next\.config\.(ts|js|mjs|cjs)$/, "Next.js"],
+  [/(^|\/)nuxt\.config\.(ts|js|mjs)$/, "Nuxt"],
+  [/(^|\/)angular\.json$/, "Angular"],
+  [/(^|\/)svelte\.config\.(ts|js|mjs)$/, "Svelte / SvelteKit"],
+  [/(^|\/)astro\.config\.(ts|js|mjs)$/, "Astro"],
+  [/(^|\/)remix\.config\.(ts|js)$/, "Remix"],
+  [/(^|\/)gatsby-config\.(ts|js)$/, "Gatsby"],
+  [/(^|\/)app\.config\.(ts|js)$/, "Expo"],
+  [/(^|\/)metro\.config\.(ts|js)$/, "React Native"],
+  [/(^|\/)pubspec\.yaml$/, "Flutter"],
+  [/(^|\/)vite\.config\.(ts|js|mjs)$/, "Vite"],
+];
+
 const STYLING: readonly Match[] = [
   ["tailwindcss", "Tailwind CSS"], ["styled-components", "styled-components"],
   ["@emotion/react", "Emotion"], ["@vanilla-extract/css", "vanilla-extract"],
@@ -141,6 +159,38 @@ const COMPONENT_LIBRARIES: readonly Match[] = [
 
 const matched = (deps: ReadonlySet<string>, table: readonly Match[]): readonly string[] =>
   table.filter(([dependency]) => deps.has(dependency)).map(([, label]) => label);
+
+/**
+ * Cleans a caller-supplied tree so it behaves like the output of the internal walk:
+ * forward slashes, no leading `./`, ignored directories dropped, and any shared
+ * absolute prefix removed so `src/components/...` checks still match.
+ */
+const normalizeTree = (entries: readonly string[]): FileTree => {
+  const cleaned = entries
+    .map((entry) => entry.trim().replace(/\\/g, "/").replace(/^\.\//, ""))
+    .filter((entry) => entry !== "" && !entry.endsWith("/"))
+    .filter((entry) => !entry.split("/").some((segment) => SKIP_DIRS.has(segment)));
+
+  const truncated = cleaned.length > MAX_FILES;
+  const bounded = truncated ? cleaned.slice(0, MAX_FILES) : cleaned;
+
+  // Strip the deepest directory prefix shared by every entry, so absolute paths
+  // from the caller's machine collapse to repo-relative ones.
+  const split = bounded.map((entry) => entry.split("/"));
+  const first = split[0];
+  let shared = 0;
+  if (first !== undefined && split.length > 0) {
+    while (shared < first.length - 1) {
+      const segment = first[shared];
+      if (segment === undefined) break;
+      if (!split.every((parts) => parts.length > shared + 1 && parts[shared] === segment)) break;
+      shared += 1;
+    }
+  }
+
+  const files = split.map((parts) => parts.slice(shared).join("/")).filter((entry) => entry !== "");
+  return { files, truncated };
+};
 
 /** One line of the report: either a finding with its evidence, or an explicit miss. */
 type Finding = {
@@ -218,18 +268,41 @@ const extractCustomProperties = (css: string): readonly string[] => {
   return [...names];
 };
 
+type Mode = "filesystem" | "tree";
+
+/** Returns a file's text, or undefined when contents are unavailable (tree mode). */
+type TextReader = (relPath: string) => Promise<string | undefined>;
+
 type Analysis = {
-  readonly root: string;
+  readonly mode: Mode;
   readonly findings: readonly Finding[];
   readonly notes: readonly string[];
   readonly stackLine: string | undefined;
 };
 
-const analyzeProject = async (root: string): Promise<Analysis> => {
-  const { files, truncated } = await walk(root);
+const analyzeProject = async (
+  tree: FileTree,
+  readText: TextReader,
+  mode: Mode,
+): Promise<Analysis> => {
+  const { files, truncated } = tree;
   const notes: string[] = [];
-  if (truncated) notes.push(`Tree walk stopped at ${MAX_FILES} files; analysis may be partial.`);
-  if (files.length === 0) notes.push("No files found below the given path (after skipping build and dependency directories).");
+  if (truncated) notes.push(`Stopped at ${MAX_FILES} files; analysis may be partial.`);
+  if (files.length === 0) {
+    notes.push(
+      mode === "tree"
+        ? "The supplied tree contained no usable file paths (after dropping build and dependency directories)."
+        : "No files found below the given path (after skipping build and dependency directories).",
+    );
+  }
+  if (mode === "tree") {
+    notes.push(
+      "Source: caller-supplied file tree. Only paths were available, not file contents — " +
+        "so dependency-based detection and design tokens are inferred from filenames alone, " +
+        "or reported as not detected. Call with `path` instead when migaki runs on the same " +
+        "machine as the repo for a fuller analysis.",
+    );
+  }
 
   // Dependencies are unioned across every manifest in the tree (root first), so a
   // monorepo whose UI package sits in apps/web is still detected.
@@ -241,11 +314,12 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
   const deps = new Set<string>();
   const manifestSources: string[] = [];
   for (const manifest of manifests) {
-    const parsed = parseJson(await readTextFile(root, manifest));
+    const parsed = parseJson(await readText(manifest));
     const names = dependencyNames(parsed);
     if (names.size > 0) manifestSources.push(manifest);
     for (const name of names) deps.add(name);
   }
+  const depsAvailable = manifestSources.length > 0;
 
   const findings: Finding[] = [];
 
@@ -280,18 +354,41 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
   });
 
   // --- Framework ----------------------------------------------------------
-  const frameworks = matched(deps, FRAMEWORKS);
+  // Config-file markers are checked alongside dependencies, so this still works
+  // when only paths are available.
+  const markerHits: string[] = [];
+  const markerFiles: string[] = [];
+  for (const [pattern, label] of FRAMEWORK_MARKERS) {
+    const hit = files.find((file) => pattern.test(file));
+    if (hit !== undefined && !markerHits.includes(label)) {
+      markerHits.push(label);
+      markerFiles.push(hit);
+    }
+  }
+  if (filesWithExtension(files, [".vue"]).length > 0 && !markerHits.includes("Vue")) markerHits.push("Vue");
+  if (filesWithExtension(files, [".svelte"]).length > 0 && !markerHits.some((h) => h.startsWith("Svelte"))) {
+    markerHits.push("Svelte");
+  }
+
+  const frameworks = [...new Set([...matched(deps, FRAMEWORKS), ...markerHits])];
   findings.push({
     label: "Framework",
     value: frameworks.length > 0 ? frameworks.join(" + ") : undefined,
-    evidence: frameworks.length > 0 ? manifestSources : [],
-    checked: `dependencies in ${manifests.length} manifest(s)`,
+    evidence: [...manifestSources, ...markerFiles],
+    checked: depsAvailable
+      ? `dependencies in ${manifests.length} manifest(s), framework config files, and .vue/.svelte files`
+      : "framework config files and .vue/.svelte files (no readable dependency manifest)",
   });
 
   // --- Styling ------------------------------------------------------------
   const stylesheets = filesWithExtension(files, STYLESHEET_EXTENSIONS);
   const stylingHits: string[] = [...matched(deps, STYLING)];
   const tailwindConfig = files.find((file) => /(^|\/)tailwind\.config\.(ts|js|mjs|cjs)$/.test(file));
+  // A tailwind config is proof of Tailwind on its own — the dependency may not be
+  // readable (tree mode), and without this a Tailwind project reads as plain CSS.
+  if (tailwindConfig !== undefined && !stylingHits.includes("Tailwind CSS")) {
+    stylingHits.unshift("Tailwind CSS");
+  }
   const cssModules = files.filter((file) => file.includes(".module.")).length;
   if (cssModules > 0) stylingHits.push(`CSS Modules (${cssModules} files)`);
   if (stylingHits.length === 0 && stylesheets.length > 0) stylingHits.push("plain CSS");
@@ -303,13 +400,15 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
       stylesheets.length > 0 ? `${stylesheets.length} stylesheet(s)` : "",
       ...manifestSources,
     ].filter((e) => e !== ""),
-    checked: "package.json dependencies, tailwind config, .module.* files, stylesheet extensions",
+    checked: depsAvailable
+      ? "package.json dependencies, tailwind config, .module.* files, stylesheet extensions"
+      : "tailwind config, .module.* files, stylesheet extensions (no readable dependency manifest)",
   });
 
   // --- Component library --------------------------------------------------
   const libraries: string[] = [...matched(deps, COMPONENT_LIBRARIES)];
   const shadcnConfig = files.some((file) => basename(file) === "components.json");
-  if (shadcnConfig) libraries.push("shadcn/ui (components.json present)");
+  if (shadcnConfig) libraries.push("shadcn/ui");
   if (deps.has("@radix-ui/react-dialog") || [...deps].some((d) => d.startsWith("@radix-ui/"))) {
     libraries.push("Radix UI primitives");
   }
@@ -317,7 +416,9 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
     label: "Component library",
     value: libraries.length > 0 ? libraries.join(", ") : undefined,
     evidence: shadcnConfig ? ["components.json"] : [],
-    checked: "package.json dependencies and components.json",
+    checked: depsAvailable
+      ? "package.json dependencies and components.json"
+      : "components.json (no readable dependency manifest)",
   });
 
   // --- Design tokens ------------------------------------------------------
@@ -325,7 +426,7 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
   const tokenSources: string[] = [];
   let tailwindV4Theme = false;
   for (const sheet of rankStylesheets(stylesheets)) {
-    const css = await readTextFile(root, sheet);
+    const css = await readText(sheet);
     if (css === undefined) continue;
     if (css.includes("@theme")) tailwindV4Theme = true;
     const properties = extractCustomProperties(css);
@@ -335,7 +436,7 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
     }
   }
   const tailwindExtends = tailwindConfig !== undefined
-    ? (await readTextFile(root, tailwindConfig))?.includes("extend") === true
+    ? (await readText(tailwindConfig))?.includes("extend") === true
     : false;
 
   const tokenSummary: string[] = [];
@@ -350,7 +451,9 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
     label: "Design tokens / spacing",
     value: tokenSummary.length > 0 ? tokenSummary.join("; ") : undefined,
     evidence: tokenSources,
-    checked: "CSS custom properties in stylesheets, tailwind theme config, @theme blocks",
+    checked: mode === "tree"
+      ? "nothing — design tokens live inside files, which a path-only tree cannot supply"
+      : "CSS custom properties in stylesheets, tailwind theme config, @theme blocks",
   });
 
   // --- Established patterns ----------------------------------------------
@@ -381,17 +484,24 @@ const analyzeProject = async (root: string): Promise<Analysis> => {
   const stackParts = [frameworks[0], stylingHits[0], libraries[0]].filter((part): part is string => part !== undefined);
   const stackLine = stackParts.length > 0 ? stackParts.join(" + ") : undefined;
 
-  return { root, findings, notes, stackLine };
+  return { mode, findings, notes, stackLine };
 };
 
-const renderAnalysis = (analysis: Analysis, requestedPath: string): string => {
+const escapeAttribute = (value: string): string =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const renderAnalysis = (analysis: Analysis, subject: string): string => {
   const lines = analysis.findings.map(renderFinding).map((line) => `- ${line}`);
   const notes = analysis.notes.length > 0 ? `\n\nNotes:\n${analysis.notes.map((n) => `- ${n}`).join("\n")}` : "";
   const stack = analysis.stackLine === undefined
     ? "\n\nSuggested `stack` value for the review tool: none — too little detected to summarise."
     : `\n\nSuggested \`stack\` value for the review tool: "${analysis.stackLine}"`;
 
-  return `<project-analysis path="${requestedPath.replace(/"/g, "&quot;")}">\n${lines.join("\n")}${notes}${stack}\n</project-analysis>`;
+  const attribute = analysis.mode === "tree"
+    ? `source="tree" files="${escapeAttribute(subject)}"`
+    : `source="filesystem" path="${escapeAttribute(subject)}"`;
+
+  return `<project-analysis ${attribute}>\n${lines.join("\n")}${notes}${stack}\n</project-analysis>`;
 };
 
 export const registerAnalyzeTool = (server: McpServer): void => {
@@ -400,20 +510,55 @@ export const registerAnalyzeTool = (server: McpServer): void => {
     {
       title: "Analyze a project's stack and conventions",
       description:
-        "Reads a repository and reports its inferred stack, styling approach, component library, " +
-        "design tokens, and established conventions — so UI generated for the project matches what " +
-        "is already there. Anything that cannot be inferred is reported as not detected rather than " +
-        "guessed. Returns a suggested value for the review tool's `stack` parameter.",
+        "Reports a project's inferred stack, styling approach, component library, design tokens, " +
+        "and established conventions — so UI generated for it matches what is already there. " +
+        "Supply `tree` (a list of file paths) when migaki runs remotely and cannot see the repo; " +
+        "supply `path` when it runs on the same machine, which also lets it read file contents for " +
+        "a fuller analysis. Anything that cannot be inferred is reported as not detected rather " +
+        "than guessed. Returns a suggested value for the review tool's `stack` parameter.",
       inputSchema: {
         path: z
           .string()
           .min(1, "path must not be empty")
-          .describe("Absolute or relative path to the repository root to analyze."),
+          .optional()
+          .describe(
+            "Path to the repository root, read from the machine running migaki. " +
+              "Use only when the server is local to the repo. Ignored if `tree` is given.",
+          ),
+        tree: z
+          .array(z.string())
+          .min(1, "tree must contain at least one path")
+          .optional()
+          .describe(
+            "The repository's file paths, e.g. the output of `git ls-files`. Use this when " +
+              "migaki runs remotely. Paths may be absolute or relative; a shared prefix is stripped.",
+          ),
       },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ path }) => {
+    async ({ path, tree }) => {
       try {
+        // `tree` wins: the caller can see their own repo, the server may not.
+        if (tree !== undefined) {
+          const normalized = normalizeTree(tree);
+          const analysis = await analyzeProject(normalized, async () => undefined, "tree");
+          const subject = `${normalized.files.length} path(s)`;
+          return { content: [{ type: "text" as const, text: renderAnalysis(analysis, subject) }] };
+        }
+
+        if (path === undefined) {
+          return {
+            isError: true,
+            content: [{
+              type: "text" as const,
+              text:
+                "analyze failed: supply either `tree` (a list of the repository's file paths — use " +
+                "this when migaki runs remotely) or `path` (a directory on the machine running " +
+                "migaki). Neither was provided.",
+            }],
+          };
+        }
+
         const root = resolve(path);
 
         let info;
@@ -422,7 +567,7 @@ export const registerAnalyzeTool = (server: McpServer): void => {
         } catch (error: unknown) {
           return {
             isError: true,
-            content: [{ type: "text" as const, text: `analyze failed: ${describeFsError(error)}: ${path}` }],
+            content: [{ type: "text" as const, text: `analyze failed: ${describeFsError(error)}: ${path}. If migaki is running remotely it cannot see your filesystem — pass \`tree\` instead.` }],
           };
         }
         if (!info.isDirectory()) {
@@ -432,7 +577,8 @@ export const registerAnalyzeTool = (server: McpServer): void => {
           };
         }
 
-        const analysis = await analyzeProject(root);
+        const walked = await walk(root);
+        const analysis = await analyzeProject(walked, (relPath) => readTextFile(root, relPath), "filesystem");
         return { content: [{ type: "text" as const, text: renderAnalysis(analysis, path) }] };
       } catch (error: unknown) {
         return {

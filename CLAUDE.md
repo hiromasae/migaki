@@ -66,9 +66,13 @@ Takes a snippet of UI code and returns a structured critique against the taste l
 The critique should: flag specific patterns from `slop.md` by name, reference relevant `edge.md` entries as positive direction, note what is working, and return as structured text with clear sections. Do not return a generic essay.
 
 ### `analyze`
-Takes a repo path or file tree and returns inferred stack, conventions, and existing design patterns. Used during setup so agents understand a project before generating anything — this context feeds into the `review` tool so critiques are project-aware. Parameters: `path` (string, required).
+Takes a repo path or file tree and returns inferred stack, conventions, and existing design patterns. Used during setup so agents understand a project before generating anything — this context feeds into the `review` tool so critiques are project-aware. Parameters: `path` (string, optional), `tree` (array of strings, optional). One of the two is required; if neither is given, return a clear error saying so.
 
-Should return: framework and language, styling approach, component library if any, existing design tokens or spacing conventions, and any patterns already established in the codebase. If something cannot be inferred, say so explicitly rather than guessing.
+`tree` is a list of the repository's file paths, supplied by the calling agent — e.g. the output of `git ls-files`. It exists because a deployed migaki reads its own container's filesystem, not the caller's: `path` only works when the server runs on the same machine as the repo. When both are given, `tree` wins.
+
+The two modes do not have equal reach, and the difference must be stated in the output rather than hidden. With `path`, file contents are readable, so dependencies, CSS custom properties, and theme config are all available. With `tree` there are only filenames, so detection falls back to config-file markers (`next.config.ts`, `tailwind.config.ts`, `components.json`) and design tokens cannot be read at all. Every response states which source was used.
+
+Should return: framework and language, styling approach, component library if any, existing design tokens or spacing conventions, and any patterns already established in the codebase. If something cannot be inferred, say so explicitly rather than guessing — and say what was checked, so the caller can tell a genuine absence from a mode limitation.
 
 ## Code conventions
 
@@ -114,7 +118,7 @@ Build in this order. Do not skip ahead.
 {
   "mcpServers": {
     "migaki": {
-      "url": "https://migaki.up.railway.app/mcp"
+      "url": "https://migaki-production-d7cb.up.railway.app/mcp"
     }
   }
 }
