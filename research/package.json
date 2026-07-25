@@ -1,0 +1,24 @@
+{
+  "name": "migaki-research",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Research pipeline that proposes weekly updates to the migaki taste layer",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "daily": "node dist/daily.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.9.3"
+  }
+}

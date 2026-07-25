@@ -1,6 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { registerAnalyzeTool } from "./tools/analyze.js";
 import { registerContextTool } from "./tools/context.js";
 import { primeTasteLayer, registerReviewTool } from "./tools/review.js";
 
@@ -15,16 +16,12 @@ const HEALTH_PATH = "/health";
 const DEFAULT_PORT = 3000;
 const DEFAULT_HOST = "0.0.0.0";
 
-/**
- * Builds a fresh MCP server instance.
- *
- * `analyze` lands in a later build step and will be wired in here alongside
- * `context` and `review`.
- */
+/** Builds a fresh MCP server instance with the full migaki toolset. */
 const createMigakiServer = (): McpServer => {
   const server = new McpServer(SERVER_INFO);
   registerContextTool(server);
   registerReviewTool(server);
+  registerAnalyzeTool(server);
   return server;
 };
 
