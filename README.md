@@ -53,9 +53,14 @@ Reads a repository and reports what is already there — framework and language,
 
 | Parameter | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `path` | string | yes | Absolute or relative path to the repository root. |
+| `tree` | string[] | one of the two | The repo's file paths, e.g. `git ls-files`. Use against a deployed migaki. |
+| `path` | string | one of the two | Repository root on the machine running migaki. Local runs only. |
 
-Anything it cannot infer is reported as not detected rather than guessed. It also returns a ready-made `stack` value to hand to `review`, which is the intended pairing: analyze once per project, then pass the result into every review. Pure filesystem reads, no API call, with bounded depth and file count so a large tree cannot stall the server.
+A deployed migaki reads its own container's filesystem, not yours, so `path` only works when the server runs alongside the repo. `tree` is how a remote server sees a project: the calling agent supplies the paths. When both are given, `tree` wins.
+
+The two modes do not reach equally far, and the response says which one produced it. With `path`, file contents are readable, so dependencies, CSS custom properties, and theme config all count as evidence. With `tree` there are only filenames, so detection falls back to config-file markers — `next.config.ts`, `tailwind.config.ts`, `components.json` — and design tokens cannot be read at all.
+
+Anything it cannot infer is reported as not detected rather than guessed, along with what was checked, so a genuine absence is distinguishable from a mode limitation. It also returns a ready-made `stack` value to hand to `review`, which is the intended pairing: analyze once per project, then pass the result into every review. No API call, with bounded depth and file count so a large tree cannot stall the server.
 
 ## Connect an agent
 
@@ -65,7 +70,7 @@ The server speaks streamable HTTP at `/mcp`. Point any MCP-compatible client at 
 {
   "mcpServers": {
     "migaki": {
-      "url": "https://migaki.up.railway.app/mcp"
+      "url": "https://migaki-production-d7cb.up.railway.app/mcp"
     }
   }
 }
@@ -74,7 +79,7 @@ The server speaks streamable HTTP at `/mcp`. Point any MCP-compatible client at 
 Claude Code, from the CLI:
 
 ```bash
-claude mcp add --transport http migaki https://migaki.up.railway.app/mcp
+claude mcp add --transport http migaki https://migaki-production-d7cb.up.railway.app/mcp
 ```
 
 There is no per-user state and no session id — each request gets a fresh server instance, so the same URL works for everyone and scales horizontally.
