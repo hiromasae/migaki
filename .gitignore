@@ -1,4 +1,15 @@
-research/cache/*
+# Daily research findings are committed on purpose. They are the evidence trail
+# behind every taste layer change, and the weekly summarizer needs a week of them
+# in one place — CI runners are destroyed after each job, so anything not
+# committed does not survive to Sunday.
+#
+# The weekly artifacts derived from them are not committed. They are regenerated
+# on every run, and the reasoning worth keeping ends up in the pull request body.
+research/cache/summary-*.json
+research/cache/proposal-*.json
+research/cache/proposal-*.md
+research/cache/*.tmp
+
 node_modules/
 dist/
 .env

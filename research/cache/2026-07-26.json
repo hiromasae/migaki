@@ -1,0 +1,309 @@
+{
+  "date": "2026-07-26",
+  "model": "claude-opus-5",
+  "generated_at": "2026-07-26T19:15:11.229Z",
+  "passes": {
+    "slop": {
+      "findings": [
+        {
+          "pattern": "Anti-Inter display faces as the new default heading stack",
+          "category": "Typography",
+          "what_it_is": "Instrument Serif, Space Grotesk, Syne or Fraunces set as the page-heading face — usually a light-weight display serif hero over an Inter or system-sans body, loaded via one extra next/font or Google Fonts call. These are precisely the faces prescribed by two years of 'stop using Inter' advice.",
+          "why_it_reads_as_slop": "The escape hatch became the median. Adrian Krebs' ai-design-checker now ships a deterministic rule that flags these four families specifically when used as the page heading, calling them fine in isolation but a default-stack tell in that role — an automated slop scanner now treats the anti-Inter font as evidence of generated output. Practitioner writing from this week still names bare Inter as a tell, so both ends of the swap are marked.",
+          "what_to_do_instead": "If you can afford one non-system face, spend it on body text where it does most of the work, and keep headings in a tuned system stack with real optical adjustments (negative letter-spacing at display sizes, explicit font-optical-sizing, a chosen weight rather than the light default). If you want a display face, pick one outside the four flagged families and commit to it across headings, buttons and numerals — not only the hero.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "GitHub - AdrianKrebs/ai-design-checker: A tool to score websites for AI design patterns",
+              "url": "https://github.com/AdrianKrebs/ai-design-checker"
+            },
+            {
+              "title": "Spot the Slop: A UI Designer's Guide to Fixing AI Defaults",
+              "url": "https://world.hey.com/kostac/spot-the-slop-a-ui-designer-s-guide-to-fixing-ai-defaults-4c448c9c"
+            },
+            {
+              "title": "AI Design Slop: 16 Patterns That Out Your App as Vibe-Coded",
+              "url": "https://www.developersdigest.tech/blog/ai-design-slop-and-how-to-spot-it"
+            }
+          ]
+        },
+        {
+          "pattern": "Chat-transcript primitives on non-conversational surfaces",
+          "category": "Component patterns",
+          "what_it_is": "Left/right-aligned Bubble rows with avatars, a MessageScroller container, Attachment cards and Marker separators used for anything that streams text — agent status panels, single-assistant sidebars, log views, guided form flows. shadcn/ui shipped exactly this set (MessageScroller, Message, Bubble, Attachment, Marker) as first-class components in June 2026, and shadcn-vue mirrored it the same month.",
+          "why_it_reads_as_slop": "Until last month an agent had to invent a chat layout; now `shadcn add bubble` produces the canonical one, so the same avatar-plus-bubble transcript appears regardless of whether there are two participants. The primitives are new enough that their defaults are untouched — alignment, grouped messages, reaction row, collapsible content all as shipped — which is what makes the surface identifiable across unrelated products.",
+          "what_to_do_instead": "For single-assistant surfaces drop the bubble and the avatar: set message rows flush to the container and carry the role distinction with type weight, colour or a rule rather than alignment plus a rounded surface. Reserve Bubble for genuinely multi-party threads. If you use Message, override the alignment and header/footer slots instead of accepting the demo composition.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            },
+            {
+              "title": "Changelog - shadcn/vue",
+              "url": "https://www.shadcn-vue.com/docs/changelog"
+            },
+            {
+              "title": "Shadcn/UI has Released New Components that are More AI-friendly",
+              "url": "https://javascript.plainenglish.io/shadcn-ui-has-released-new-components-that-are-more-ai-friendly-c0aa83d27de6"
+            }
+          ]
+        },
+        {
+          "pattern": "`shimmer` as the shipped default for every pending and streaming state",
+          "category": "Motion and animation",
+          "what_it_is": "shadcn/ui's June 2026 chat release added two CSS utilities alongside the components: `scroll-fade` and `shimmer`. `shimmer` is the travelling-highlight sweep over text or skeleton blocks; because it now installs as a utility class with the chat components, it gets applied to any pending region — token streaming, button loading states, empty tables, card skeletons.",
+          "why_it_reads_as_slop": "Skeleton shimmer used to be hand-rolled with a gradient background and a keyframe, which meant someone decided to have it. As of last month it is a one-word class in the most-generated component library in the ecosystem, so it now shows up in output that never asked whether the wait is long enough to need a placeholder at all.",
+          "what_to_do_instead": "Use `shimmer` only where content arrives progressively and its shape is genuinely predictable. Under ~400ms show nothing. For streaming text, a static cursor or a single settled opacity step reads calmer than an animated sweep; for tables and lists, render the real row chrome with empty cells instead of pulsing bars. If you keep shimmer, slow it and drop the highlight contrast well below the default.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            },
+            {
+              "title": "Changelog - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog"
+            }
+          ]
+        },
+        {
+          "pattern": "Untuned blanket prose class on every rendered-markdown region",
+          "category": "Typography",
+          "what_it_is": "A single wrapper class that styles all descendant headings, paragraphs, lists, tables and code. shadcn/ui shipped `shadcn/typeset` in July 2026: add `typeset` to a container and everything inside is styled, with three variables to tune — `--typeset-size`, `--typeset-leading`, `--typeset-flow`. Vercel's CEO promoted it specifically for AI agent use.",
+          "why_it_reads_as_slop": "This is the Tailwind `prose` situation arriving again under a new name, with the same failure mode: the class goes on and the three variables never get set, so a chat message, a docs page and a marketing changelog share one vertical rhythm. The library's own example contrasts `typeset-chat` at 1.6 leading with `typeset-docs` at 1.75 — evidence that per-context tuning is the intended use, and therefore the step generated output skips.",
+          "what_to_do_instead": "Define at least two named typesets per product and set all three variables explicitly for each: tight leading and small flow for conversational or dense UI, roomier for long-form. Never ship the bare `typeset` class as the only treatment, and express flow in `em` so it tracks the size you chose.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "July 2026 - Introducing shadcn/typeset - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-07-typeset"
+            },
+            {
+              "title": "shadcn releases typeset.css to automate typography",
+              "url": "https://digg.com/tech/kipklr63"
+            }
+          ]
+        },
+        {
+          "pattern": "Coloured accent line pinned to a card or panel edge",
+          "category": "Visual treatment",
+          "what_it_is": "A 2–4px saturated rule on the left or top edge of a card, panel or callout — `border-l-4 border-primary`, or an absolutely positioned gradient bar — often with a rounded curve where the line meets the panel, and frequently paired with an icon stacked above the card heading.",
+          "why_it_reads_as_slop": "The accent line is now one of the deterministic patterns in a published slop scanner: Krebs' audit of 1,590 Show HN landing pages scored coloured lines on and beside cards, and icons sitting on top of cards, as AI tells, binning 22% of pages as heavy slop and 32% as mild. A designer writing four days ago independently names the same motif — the left-edge coloured line plus curve on a panel — as something recognised within three seconds.",
+          "what_to_do_instead": "Carry status or category with something that scales: the card's own background tone, a text label, or a small dot aligned to the heading baseline. If you need edge emphasis, make it structural — a full-bleed tinted header band, or a hairline in the border colour rather than the brand colour. Drop the icon-above-heading stack; put the icon inline with the title or remove it.",
+          "confidence": "high",
+          "sources": [
+            {
+              "title": "Analyzing the explosive increase in submissions to Show HN regarding unoriginal design patterns often seen in AI - GIGAZINE",
+              "url": "https://gigazine.net/gsc_news/en/20260423-design-slop/"
+            },
+            {
+              "title": "Spot the Slop: A UI Designer's Guide to Fixing AI Defaults",
+              "url": "https://world.hey.com/kostac/spot-the-slop-a-ui-designer-s-guide-to-fixing-ai-defaults-4c448c9c"
+            },
+            {
+              "title": "AI Design Slop: 16 Patterns That Out Your App as Vibe-Coded",
+              "url": "https://www.developersdigest.tech/blog/ai-design-slop-and-how-to-spot-it"
+            }
+          ]
+        },
+        {
+          "pattern": "Named library style preset standing in for a visual decision",
+          "category": "Visual treatment",
+          "what_it_is": "Picking one of shadcn/ui's eight shipped styles — Vega, Nova, Maia, Lyra, Mira, Luma, Rhea, Sera — from the style switcher and treating that as the product's look. Rhea, added May 2026, is described by the library as keeping the rounded soft aesthetic while refining details: denser surfaces, ring-based focus states, subtle press interactions on buttons. Sera shipped April, Luma March.",
+          "why_it_reads_as_slop": "Six months ago there was effectively one shadcn look, so it read as a starting point. Now a new named style lands every month or two and is selectable from a switcher, which means a product's visual identity is increasingly a preset name an agent picked — and each preset's signature (that ring focus, that radius, that press scale) is recognisable across every app that picked it. The library itself frames styles as a place to start and then make your own.",
+          "what_to_do_instead": "After applying a preset, change the things that carry its fingerprint: the radius scale (including whether radius varies by component size), the focus treatment (offset outline versus inset ring), shadow depth, and the border colour's relationship to the surface. Change radius and focus at minimum — they identify the preset faster than colour does.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "Changelog - shadcn/vue (Rhea style and chat components)",
+              "url": "https://www.shadcn-vue.com/docs/changelog"
+            },
+            {
+              "title": "Changelog - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog"
+            },
+            {
+              "title": "July 2026 - React Aria - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-07-react-aria"
+            },
+            {
+              "title": "The shadcn trap: why shadcn looks generic and how to fix it",
+              "url": "https://freedesignmd.com/blog/shadcn-looks-generic"
+            }
+          ]
+        },
+        {
+          "pattern": "Radix-era `asChild` composition emitted into Base UI scaffolds",
+          "category": "Structural tells",
+          "what_it_is": "Generated components that compose with `asChild` and hang styles off `data-state` selectors, in a project where `npx shadcn init` installed Base UI. As of the July 2026 changelog, new shadcn projects default to Base UI rather than Radix, docs tabs open on Base UI first, composition is a `render` prop instead of `asChild`, and Base UI scopes its own state selectors.",
+          "why_it_reads_as_slop": "The default flipped this month; the training median is three years of Radix. The result is code aimed at the wrong primitive layer — `asChild` on Base UI parts, variant styles keyed to attributes that never appear — a legible date stamp on generated output that silently produces dead styling. Because v0, Cursor, Bolt, Lovable and Claude Code all emit shadcn by default, the mismatch is broadly distributed rather than incidental.",
+          "what_to_do_instead": "Pin the primitive explicitly so intent is recorded in the repo: ship a `registry:base` config or init with `--base`, and state the base in your agent instructions. Convert `asChild` to `render` and re-derive state styling from that base's own selectors instead of assuming `data-state`. If a codebase is already on Radix, say so — Radix is not deprecated, and a mixed-base component set is the worse outcome.",
+          "confidence": "medium",
+          "sources": [
+            {
+              "title": "July 2026 - Base UI as the Default - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-07-base-ui-default"
+            },
+            {
+              "title": "shadcn/ui Base UI Default: What React Devs Must Know Now",
+              "url": "https://byteiota.com/shadcn-ui-base-ui-default-what-react-devs-must-know-now/"
+            }
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 264976,
+        "output_tokens": 14115,
+        "web_search_requests": 12
+      }
+    },
+    "edge": {
+      "findings": [
+        {
+          "pattern": "Scroll-aware edge fade as a mask, not an overlay",
+          "category": "Visual Treatment",
+          "looks_like": "A `scroll-fade` / `scroll-fade-y` / `scroll-fade-x` utility applied directly to the element that owns `overflow-y-auto`. The fade is a `mask-image` linear ramp from transparent to black, driven by CSS scroll-driven animations rather than scroll listeners. State is legible: at rest the top edge is crisp and the bottom edge dissolves; mid-scroll both edges are faded; at the end the bottom edge sharpens again. `scroll-fade-x` follows reading direction, so RTL mirrors to a crisp right edge. Pairs with a `scrollbar-none` utility from the same package. Now ships in `shadcn/tailwind.css` by default for new projects.",
+          "why_it_works": "A gradient overlay is a lie painted on top of the content — it only matches one background color, and it stays put when there is nothing left to scroll. Masking dissolves the content itself, so it works on any surface and the edge state becomes a truthful readout of scroll position. The reader learns 'sharp edge means you are at the end' without ever being told.",
+          "execute_it_well": "Put background and border on a wrapper and `scroll-fade` on the inner scroller. The common failure is applying it to the card itself, which dissolves the card's own chrome and border along with the content. Also verify the no-scroll-driven-animations fallback (a static fade on both edges) does not read as a permanent, meaningless vignette on short lists — good implementations show no fade at all when content does not overflow.",
+          "retirement_risk": "medium",
+          "sources": [
+            {
+              "title": "scroll-fade - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/utils/scroll-fade"
+            },
+            {
+              "title": "scroll-fade - shadcn/vue",
+              "url": "https://www.shadcn-vue.com/docs/utilities/scroll-fade"
+            },
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            }
+          ]
+        },
+        {
+          "pattern": "Asymmetric message framing: user in a bubble, assistant unframed",
+          "category": "AI-Native Interfaces",
+          "looks_like": "A `Bubble` component with an explicit variant taxonomy rather than one rounded rectangle for everyone: a low-emphasis default, a `tinted` variant whose fill is a softer color derived from the primary, an `outlined` variant, a `destructive` variant, and a `ghost` variant. Ghost bubbles carry no frame and run the full width of the container, and are the intended treatment for assistant text, markdown, and rendered code. The framed variants carry the human turn.",
+          "why_it_works": "Assistant output is long-form document content — headings, lists, code blocks, tables. Wrapping it in a chat bubble fights its own internal structure and wastes measure. Human turns are short and benefit from a container that marks them as discrete utterances. Framing only one side makes speaker identity readable from shape alone, at a glance, with no avatar or label.",
+          "execute_it_well": "Reserve the frame for the shorter, discrete side and let the generated side breathe at full container width. The failure mode is symmetric bubbles: a code block inside a right-aligned rounded pill with 60% max-width, which forces horizontal scrolling inside a bubble inside a scroller. Derive the tint from the primary token rather than hardcoding a wash, so it survives theming and dark mode.",
+          "retirement_risk": "medium",
+          "sources": [
+            {
+              "title": "Changelog – shadcn/vue (July 2026, chat interface components)",
+              "url": "https://www.shadcn-vue.com/docs/changelog"
+            },
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            }
+          ]
+        },
+        {
+          "pattern": "Turn anchoring with a peek of the previous turn",
+          "category": "Motion and Interaction",
+          "looks_like": "A dedicated scroll container primitive for transcripts (`MessageScroller`, with the behavior split into headless `@shadcn/react/message-scroller`) that owns anchored turns, auto-follow of streamed replies, prepended-history preservation, saved-thread restore, jump-to-message, and visibility tracking. The specific craft detail is a `scrollPreviousItemPeek` option: when a new turn scrolls to the top anchor, a slice of the prior turn stays visible above it.",
+          "why_it_works": "Naive 'scroll new turn to top' makes every question feel like it opened a blank document — the reader loses the thread they were mid-way through. Leaving a visible sliver of the previous turn preserves spatial continuity, so the transcript reads as one scroll surface rather than a stack of pages. It is the same reason paginated readers show a line of overlap.",
+          "execute_it_well": "Treat scroll behavior as a primitive with its own state machine, not as `scrollIntoView` calls sprinkled through render. The hard cases are the ones that make the difference: loading older history must not jump the viewport, and auto-follow must release the moment the user scrolls up and re-engage only on an explicit control. The failure mode is a transcript that yanks itself downward while the user is reading something above.",
+          "retirement_risk": "low",
+          "sources": [
+            {
+              "title": "Message Scroller - shadcn/vue",
+              "url": "https://www.shadcn-vue.com/docs/components/message-scroller"
+            },
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            }
+          ]
+        },
+        {
+          "pattern": "Authorship attribution as a document layer",
+          "category": "AI-Native Interfaces",
+          "looks_like": "Linear's July 2026 release adds author name indicators to documents and project descriptions, so a reader can tell whether a passage was written by a colleague or inserted by an automated Loop. Edits made through the agent highlight separately from human edits during review. Version history exposes restore-to-checkpoint. Crucially, attribution and version history are toggled from the ⌘/Ctrl+K menu or document display options — off by default, summoned when you need it.",
+          "why_it_works": "Once agents write into shared documents, the question 'who claimed this?' becomes the primary trust operation, and it is not answerable from the prose. Rendering provenance as an optional display mode rather than permanent inline chrome keeps the document readable while making the audit one keystroke away. Persistent badges on every paragraph would destroy the reading surface they are trying to make trustworthy.",
+          "execute_it_well": "Make provenance a view mode, not decoration — same document, different lens, reachable from the command menu. Highlight agent-originated edits in a channel distinct from human edits so review is a diff, not a hunt. Pair it with checkpoint restore; attribution without a cheap undo just tells users about a problem they cannot fix. Failure mode: a permanent 'AI generated' badge that users learn to ignore in a week.",
+          "retirement_risk": "low",
+          "sources": [
+            {
+              "title": "Text attribution and agent-assisted editing – Linear Changelog",
+              "url": "https://linear.app/changelog/2026-07-23-agent-assisted-editing"
+            },
+            {
+              "title": "Changelog – Linear",
+              "url": "https://linear.app/changelog"
+            }
+          ]
+        },
+        {
+          "pattern": "Deterministic stream fixtures as a design surface",
+          "category": "AI-Native Interfaces",
+          "looks_like": "`@shadcn/helpers` (July 2026) ships a fixture layer that plugs into `useChat` as a transport and emits real AG-UI streaming events — reasoning steps, tool calls, loading states, message components — with deterministic output and no backend. Authoring is a script: `writer.text(\"…\")` and friends compose a replayable transcript. Intended for building components, previews, documentation, and tests of streaming interfaces.",
+          "why_it_works": "Streaming UI is mostly transition states, and transition states are exactly what you cannot inspect when every run differs. A deterministic replay makes the awkward frames — the gap before the first token, the tool-call card appearing mid-paragraph, the layout shift when reasoning collapses — reviewable, screenshot-able, and diffable. It converts 'it felt janky' into a reproducible artifact.",
+          "execute_it_well": "Emit the same event shapes production emits, so the fixture exercises the real component paths rather than a parallel mock branch. Script the ugly cases deliberately: an empty first chunk, a tool call that fails, a very long token burst, an interrupted stream. Failure mode is a fixture that only plays the happy path at a flattering speed, which is how streaming interfaces ship with unreviewed error and cancellation states.",
+          "retirement_risk": "low",
+          "sources": [
+            {
+              "title": "July 2026 - Introducing @shadcn/helpers - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-07-helpers"
+            },
+            {
+              "title": "Changelog - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog"
+            }
+          ]
+        },
+        {
+          "pattern": "Declarative hover cards with interestfor and popover=hint",
+          "category": "Component Patterns",
+          "looks_like": "`<button interestfor=\"card\">` plus `<div id=\"card\" popover=\"hint\">`, positioned with CSS anchor positioning. `interestfor` replaces `popovertarget` and fires on 'interest' — hover, keyboard focus, or long-press on touch — rather than click. `popover=\"hint\"` popovers are ephemeral and, unlike `popover=\"auto\"`, do not force other popovers closed. No mouseenter/mouseleave listeners, no manual positioning code, no focus management.",
+          "why_it_works": "The reason hover UI is usually broken is that mouse hover is one input modality and teams hand-implement the other three. Moving the trigger into the platform means keyboard and touch get correct behavior by default, and the hint semantics mean a tooltip no longer dismisses the menu it was spawned from — the exact bug that makes hand-rolled layered UI feel cheap.",
+          "execute_it_well": "Use `hint` only for genuinely ephemeral, non-interactive-critical content; anything the user must click through belongs in an `auto` popover. Respect the delay semantics rather than showing instantly on pointer entry. Because support is still landing across engines, gate on `@supports` or accept a click-to-open fallback — the failure mode is shipping a hover card that is simply unreachable in a browser without interest invokers.",
+          "retirement_risk": "low",
+          "sources": [
+            {
+              "title": "CSS Hover Tooltips with popover=hint and interestfor",
+              "url": "https://modern-css.com/hover-tooltips-without-javascript-events/"
+            },
+            {
+              "title": "CSS Wrapped 2025 - Chrome Demos",
+              "url": "https://chrome.dev/css-wrapped-2025/"
+            },
+            {
+              "title": "What's New in CSS | modern.css",
+              "url": "https://modern-css.com/whats-new/"
+            }
+          ]
+        },
+        {
+          "pattern": "Agent progress in the periphery, not the content",
+          "category": "Motion and Interaction",
+          "looks_like": "Linear's July 2026 changelog adds an animated desktop tab indicator that appears when a coding agent is actively working on an issue or PR review — the signal lives in the app tab strip, outside the reading surface. The same release adds an option to hide sidebar notification badges. On the component side, shadcn ships a `shimmer` text utility scoped specifically to live status strings ('Thinking…', 'Generating response…', running tools, streaming markers) rather than to content.",
+          "why_it_works": "Background agent work runs for minutes, and a spinner planted in the content area holds the user's attention hostage for the whole duration. Pushing the signal to app chrome lets someone leave the page and still know work is in flight. Shimmer on a short status string reads as 'alive' at the edge of vision; shimmer on a paragraph of real content is unreadable, because the eye cannot fixate on moving text.",
+          "execute_it_well": "Pick one peripheral channel and keep it quiet — animated tab indicator or badge, not both, and give users a switch to turn badges off. Scope shimmer to a single line of ephemeral status text and kill it the instant real content arrives. Honor `prefers-reduced-motion` with a static state. The failure mode is shimmer as a general-purpose loading aesthetic, applied to skeletons, cards, and streamed prose alike — that version is already common enough to be heading for slop.",
+          "retirement_risk": "medium",
+          "sources": [
+            {
+              "title": "Changelog – Linear (July 2026)",
+              "url": "https://linear.app/changelog"
+            },
+            {
+              "title": "Text attribution and agent-assisted editing – Linear Changelog",
+              "url": "https://linear.app/changelog/2026-07-23-agent-assisted-editing"
+            },
+            {
+              "title": "June 2026 - Components for Chat Interfaces - shadcn/ui",
+              "url": "https://ui.shadcn.com/docs/changelog/2026-06-chat-components"
+            }
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 267592,
+        "output_tokens": 9725,
+        "web_search_requests": 12
+      }
+    }
+  }
+}
