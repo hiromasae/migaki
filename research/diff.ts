@@ -21,12 +21,19 @@
 import { readFile, mkdir, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  EDGE_FILE,
+  PROPOSAL_KIND,
+  PROPOSAL_VERSION,
+  SLOP_FILE,
+  WATCH_SECTION,
   assertWritableTarget,
   cacheDir,
   describeError,
   describeSchemaError,
   loadTasteFiles,
   normalizeName,
+  proposalFileSchema,
+  proposalPath,
   readPositiveIntEnv,
   renderTasteEntry,
   resolveRepoRoot,
@@ -35,21 +42,18 @@ import {
   weeklySummarySchema,
 } from "./shared.js";
 import type {
+  Covered,
+  Deferred,
   EdgeCluster,
-  Lane,
-  Level,
+  Evidence,
+  Proposal,
+  ProposalAction as Action,
   SlopCluster,
   Source,
   TasteEntry,
   TasteFile,
   WeeklySummary,
 } from "./shared.js";
-
-const SLOP_FILE = "taste/slop.md";
-const EDGE_FILE = "taste/edge.md";
-const WATCH_SECTION = "Retirement Watch";
-
-type Action = "add" | "revise" | "watch" | "promote" | "confirm-retirement";
 
 /** Reviewer-facing order: things that change existing content lead. */
 const ACTION_ORDER: Record<Action, number> = {
@@ -58,61 +62,6 @@ const ACTION_ORDER: Record<Action, number> = {
   watch: 2,
   add: 3,
   revise: 4,
-};
-
-type Removal = {
-  readonly file: string;
-  readonly what: string;
-  /** 1-indexed line in the file as it stands today. Re-verify before applying. */
-  readonly line: number;
-  readonly markdown: string;
-};
-
-type Evidence = {
-  readonly lane: Lane;
-  readonly cluster_id: string;
-  readonly days_seen: number;
-  readonly dates: readonly string[];
-  readonly level: Level;
-  readonly finding_ids: readonly string[];
-  readonly sources: readonly Source[];
-};
-
-type Proposal = {
-  readonly id: string;
-  readonly action: Action;
-  readonly file: string;
-  readonly section: string;
-  /** False when the finding's category is not a `##` heading in the file today. */
-  readonly section_exists: boolean;
-  readonly entry_name: string;
-  /** Markdown to insert. Empty for a pure removal. */
-  readonly markdown: string;
-  /** The entry as it reads today, for a revision. Empty otherwise. */
-  readonly current_markdown: string;
-  /** Best-effort anchor: the last line of the section's final entry today. */
-  readonly insert_after_line: number | null;
-  readonly removes: Removal | null;
-  readonly rationale: string;
-  readonly note: string;
-  readonly evidence: Evidence;
-};
-
-type Deferred = {
-  readonly lane: Lane;
-  readonly cluster_id: string;
-  readonly name: string;
-  readonly reason: string;
-  readonly days_seen: number;
-  readonly level: Level;
-};
-
-type Covered = {
-  readonly lane: Lane;
-  readonly cluster_id: string;
-  readonly name: string;
-  readonly matched_entry: string;
-  readonly rationale: string;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -757,9 +706,9 @@ const main = async (): Promise<number> => {
   const report = renderReport(summary, built, minDaysSeen);
   const changelog = renderChangelog(summary, built.proposals);
 
-  const proposal = {
-    kind: "migaki-weekly-proposal",
-    version: 1,
+  const candidate = {
+    kind: PROPOSAL_KIND,
+    version: PROPOSAL_VERSION,
     week_start: summary.week_start,
     week_end: summary.week_end,
     generated_at: new Date().toISOString(),
@@ -781,9 +730,16 @@ const main = async (): Promise<number> => {
     report_markdown: report,
   };
 
-  const jsonTarget = join(cacheDir(root), `proposal-${weekEnd}.json`);
+  // Self-check before writing: apply.ts validates this file on read, and edits to
+  // taste/ are the last place a shape mismatch should be discovered.
+  const validated = proposalFileSchema.safeParse(candidate);
+  if (!validated.success) {
+    throw new Error(`built an invalid proposal — ${describeSchemaError(validated.error)}`);
+  }
+
+  const jsonTarget = proposalPath(root, weekEnd);
   const mdTarget = join(cacheDir(root), `proposal-${weekEnd}.md`);
-  await writeGuarded(root, jsonTarget, `${JSON.stringify(proposal, null, 2)}\n`);
+  await writeGuarded(root, jsonTarget, `${JSON.stringify(validated.data, null, 2)}\n`);
   await writeGuarded(root, mdTarget, report);
 
   process.stdout.write(report);

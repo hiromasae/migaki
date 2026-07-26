@@ -134,7 +134,7 @@ export const sourceSchema = z.object({
 });
 export type Source = z.infer<typeof sourceSchema>;
 
-const levelSchema = z.enum(["low", "medium", "high"]);
+export const levelSchema = z.enum(["low", "medium", "high"]);
 export type Level = z.infer<typeof levelSchema>;
 
 /**
@@ -423,3 +423,108 @@ export type WeeklySummary = z.infer<typeof weeklySummarySchema>;
 
 export const summaryPath = (root: string, weekEnd: string): string =>
   join(cacheDir(root), `summary-${weekEnd}.json`);
+
+/* -------------------------------------------------------------------------- */
+/* Weekly proposal — written by diff.ts, read by apply.ts                       */
+/* -------------------------------------------------------------------------- */
+
+export const PROPOSAL_KIND = "migaki-weekly-proposal";
+export const PROPOSAL_VERSION = 1;
+
+export const SLOP_FILE = "taste/slop.md";
+export const EDGE_FILE = "taste/edge.md";
+export const CHANGELOG_FILE = "taste/CHANGELOG.md";
+export const WATCH_SECTION = "Retirement Watch";
+
+/**
+ * The only files any part of this pipeline may ever edit. `core.md` is absent by
+ * design: it is timeless and hand-authored, and nothing automated touches it.
+ */
+export const APPLICABLE_FILES = [SLOP_FILE, EDGE_FILE, CHANGELOG_FILE] as const;
+
+export const actionSchema = z.enum(["add", "revise", "watch", "promote", "confirm-retirement"]);
+export type ProposalAction = z.infer<typeof actionSchema>;
+
+export const removalSchema = z.object({
+  file: z.string(),
+  what: z.string(),
+  /** Line as of when diff.ts ran. A hint only — apply.ts relocates by content. */
+  line: z.number().int(),
+  markdown: z.string(),
+});
+export type Removal = z.infer<typeof removalSchema>;
+
+export const evidenceSchema = z.object({
+  lane: z.enum(LANES),
+  cluster_id: z.string(),
+  days_seen: z.number().int(),
+  dates: z.array(z.string()),
+  level: levelSchema,
+  finding_ids: z.array(z.string()),
+  sources: z.array(sourceSchema),
+});
+export type Evidence = z.infer<typeof evidenceSchema>;
+
+export const proposalSchema = z.object({
+  id: z.string(),
+  action: actionSchema,
+  file: z.string(),
+  section: z.string(),
+  section_exists: z.boolean(),
+  entry_name: z.string(),
+  /** Markdown to insert. Empty for a revision or a removal-only change. */
+  markdown: z.string(),
+  current_markdown: z.string(),
+  insert_after_line: z.number().int().nullable(),
+  removes: removalSchema.nullable(),
+  rationale: z.string(),
+  note: z.string(),
+  evidence: evidenceSchema,
+});
+export type Proposal = z.infer<typeof proposalSchema>;
+
+export const deferredSchema = z.object({
+  lane: z.enum(LANES),
+  cluster_id: z.string(),
+  name: z.string(),
+  reason: z.string(),
+  days_seen: z.number().int(),
+  level: levelSchema,
+});
+export type Deferred = z.infer<typeof deferredSchema>;
+
+export const coveredSchema = z.object({
+  lane: z.enum(LANES),
+  cluster_id: z.string(),
+  name: z.string(),
+  matched_entry: z.string(),
+  rationale: z.string(),
+});
+export type Covered = z.infer<typeof coveredSchema>;
+
+export const proposalFileSchema = z.object({
+  kind: z.literal(PROPOSAL_KIND),
+  version: z.literal(PROPOSAL_VERSION),
+  week_start: z.string(),
+  week_end: z.string(),
+  generated_at: z.string(),
+  summary_source: z.string(),
+  min_days_seen: z.number().int(),
+  applied: z.boolean(),
+  counts: z.object({
+    proposals: z.number().int(),
+    deferred: z.number().int(),
+    covered: z.number().int(),
+    warnings: z.number().int(),
+  }),
+  proposals: z.array(proposalSchema),
+  deferred: z.array(deferredSchema),
+  covered: z.array(coveredSchema),
+  warnings: z.array(z.string()),
+  changelog_markdown: z.string(),
+  report_markdown: z.string(),
+});
+export type ProposalFile = z.infer<typeof proposalFileSchema>;
+
+export const proposalPath = (root: string, weekEnd: string): string =>
+  join(cacheDir(root), `proposal-${weekEnd}.json`);
