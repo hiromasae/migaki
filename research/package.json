@@ -11,7 +11,9 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch --preserveWatchOutput",
-    "daily": "node dist/daily.js"
+    "daily": "node dist/daily.js",
+    "summarize": "node dist/summarize.js",
+    "diff": "node dist/diff.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
