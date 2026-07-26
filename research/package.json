@@ -5,15 +5,15 @@
   "description": "Research pipeline that proposes weekly updates to the migaki taste layer",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.9"
   },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch --preserveWatchOutput",
-    "daily": "node dist/daily.js",
-    "summarize": "node dist/summarize.js",
-    "diff": "node dist/diff.js"
+    "daily": "node --env-file-if-exists=.env dist/daily.js",
+    "summarize": "node --env-file-if-exists=.env dist/summarize.js",
+    "diff": "node --env-file-if-exists=.env dist/diff.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
