@@ -1,0 +1,224 @@
+# Weekly taste layer summary.
+#
+# Consolidates the week's committed findings, works out what is genuinely new
+# against the taste files, and hands the result over in two pieces:
+#
+#   - a pull request carrying the entries that are ready to merge
+#   - an issue listing the entries that need prose written by hand, plus
+#     anything the applier refused to touch
+#
+# The split exists because those are different kinds of work. A pull request
+# says "here is a finished change, approve it", which is a promise a revision
+# cannot keep.
+#
+# Nothing here merges anything. apply.ts writes to taste/ only on the weekly
+# branch, and refuses to run on main at all.
+#
+# Requires the ANTHROPIC_API_KEY repository secret, and
+# Settings -> Actions -> General -> "Allow GitHub Actions to create and approve
+# pull requests" to be enabled.
+
+name: Weekly taste summary
+
+on:
+  schedule:
+    # 08:00 UTC Sunday, after the daily pass has committed Sunday's findings.
+    - cron: "0 8 * * 0"
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "Week ending date (YYYY-MM-DD). Blank for today."
+        required: false
+        type: string
+      min_days_seen:
+        description: "Days a pattern must recur to qualify. Blank for the default of 2."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: migaki-weekly
+  cancel-in-progress: false
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: research/package-lock.json
+
+      - name: Install
+        working-directory: research
+        run: npm ci
+
+      - name: Build
+        working-directory: research
+        run: npm run build
+
+      - name: Resolve the week
+        id: week
+        run: |
+          set -euo pipefail
+          WEEK_END="${{ inputs.run_date }}"
+          [ -n "$WEEK_END" ] || WEEK_END="$(date -u +%F)"
+          echo "week_end=${WEEK_END}" >> "$GITHUB_OUTPUT"
+          echo "branch=weekly/${WEEK_END}" >> "$GITHUB_OUTPUT"
+          echo "proposal=research/cache/proposal-${WEEK_END}.json" >> "$GITHUB_OUTPUT"
+          echo "report=research/cache/proposal-${WEEK_END}.md" >> "$GITHUB_OUTPUT"
+
+      # Fails only if a whole lane's clustering call failed. A window with gaps
+      # in it still produces a summary, with the gaps recorded.
+      - name: Summarize the week
+        working-directory: research
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MIGAKI_RUN_DATE: ${{ steps.week.outputs.week_end }}
+        run: npm run summarize
+
+      - name: Build the proposal
+        working-directory: research
+        env:
+          MIGAKI_RUN_DATE: ${{ steps.week.outputs.week_end }}
+          MIGAKI_MIN_DAYS_SEEN: ${{ inputs.min_days_seen }}
+        run: npm run diff
+
+      - name: Read the proposal
+        id: counts
+        env:
+          PROPOSAL: ${{ steps.week.outputs.proposal }}
+        run: |
+          set -euo pipefail
+          echo "proposals=$(jq '.counts.proposals' "$PROPOSAL")" >> "$GITHUB_OUTPUT"
+          echo "revisions=$(jq '[.proposals[] | select(.action == "revise")] | length' "$PROPOSAL")" >> "$GITHUB_OUTPUT"
+
+      - name: Apply what can be applied
+        id: apply
+        if: steps.counts.outputs.proposals != '0'
+        env:
+          BRANCH: ${{ steps.week.outputs.branch }}
+          WEEK_END: ${{ steps.week.outputs.week_end }}
+        run: |
+          set -euo pipefail
+          git config user.name "migaki-research[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+
+          # apply.ts refuses to run on main, which is why the branch comes first.
+          # It exits 0 even when it refuses an edit; refusals are an outcome to
+          # report, not a reason to abandon the edits that did apply.
+          MIGAKI_RUN_DATE="$WEEK_END" node research/dist/apply.js | tee apply-outcome.md
+
+          if git diff --quiet -- taste/; then
+            echo "No taste file changes survived; nothing to open a pull request for."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git add taste/
+          git commit -m "taste: weekly research proposals for ${WEEK_END}"
+          git push origin "$BRANCH"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open the pull request
+        id: pr
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.week.outputs.branch }}
+          WEEK_END: ${{ steps.week.outputs.week_end }}
+          REPORT: ${{ steps.week.outputs.report }}
+        run: |
+          set -euo pipefail
+          {
+            cat "$REPORT"
+            echo
+            echo "---"
+            echo
+            echo "## What the applier did"
+            echo
+            echo '```'
+            cat apply-outcome.md
+            echo '```'
+            echo
+            echo "Nothing here is decided. Edit the entries on this branch as freely as you like before merging — the wording is templated from the research, not polished."
+          } > pr-body.md
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Taste layer: weekly proposals for ${WEEK_END}" \
+            --body-file pr-body.md
+          echo "url=$(gh pr view "$BRANCH" --json url --jq .url)" >> "$GITHUB_OUTPUT"
+
+      - name: Open the revisions issue
+        if: steps.counts.outputs.revisions != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROPOSAL: ${{ steps.week.outputs.proposal }}
+          WEEK_END: ${{ steps.week.outputs.week_end }}
+          PR_URL: ${{ steps.pr.outputs.url }}
+        run: |
+          set -euo pipefail
+          {
+            echo "The weekly research pass found existing entries that this week's evidence sharpens."
+            echo
+            echo "There is no diff to merge here. Each one needs a sentence or two folded into prose that was written by hand, which is why these are an issue rather than a pull request. No deadline — close it when you have."
+            if [ -n "${PR_URL:-}" ]; then
+              echo
+              echo "The ready-to-merge additions from the same run are in ${PR_URL}."
+            fi
+            echo
+            jq -r '
+              .proposals[]
+              | select(.action == "revise")
+              | "---\n\n### \(.entry_name)\n\n`\(.file)` › \(.section)\n\n\(.rationale)\n\n\(.note)\n\n<details><summary>Entry as it reads today</summary>\n\n```markdown\n\(.current_markdown)\n```\n\n</details>\n"
+            ' "$PROPOSAL"
+
+            if [ -f apply-outcome.md ]; then
+              echo "---"
+              echo
+              echo "## Applier outcome"
+              echo
+              echo '```'
+              cat apply-outcome.md
+              echo '```'
+            fi
+          } > issue-body.md
+
+          gh issue create \
+            --title "Taste layer: ${{ steps.counts.outputs.revisions }} entries need revising (week of ${WEEK_END})" \
+            --body-file issue-body.md
+
+      - name: Say so when the week was quiet
+        if: steps.counts.outputs.proposals == '0'
+        run: |
+          echo "::notice::No proposals cleared the evidence bar this week. Nothing was opened. A quiet week is a legitimate outcome — check the run health section of the report artifact before assuming the pipeline is healthy."
+
+      # Kept regardless of outcome: on a quiet week this is the only way to see
+      # whether the week was genuinely quiet or the research had been failing.
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-report-${{ steps.week.outputs.week_end }}
+          path: |
+            research/cache/summary-*.json
+            research/cache/proposal-*.json
+            research/cache/proposal-*.md
+          if-no-files-found: warn
+          retention-days: 90

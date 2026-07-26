@@ -300,6 +300,10 @@ const main = async (): Promise<number> => {
   }
   const proposal: ProposalFile = parsed.data;
 
+  // The root is logged because this script edits taste files in whatever repo
+  // contains it, which is correct under CI and surprising anywhere else. Naming
+  // the target makes an unintended one obvious at a glance rather than after.
+  console.error(`[migaki:apply] repo ${root}`);
   console.error(`[migaki:apply] branch ${branch}, ${proposal.proposals.length} proposals`);
 
   const docs = new Map<string, Doc>();

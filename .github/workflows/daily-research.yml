@@ -1,0 +1,98 @@
+# Daily research pass.
+#
+# Runs `daily.ts` and commits the day's findings to main. The findings are the
+# evidence trail behind every taste change, and the weekly summary needs a week
+# of them in one place — a CI runner is destroyed when the job ends, so anything
+# not committed does not survive to Sunday.
+#
+# This workflow only ever writes to research/cache/. It does not touch taste/.
+#
+# Requires the ANTHROPIC_API_KEY repository secret.
+
+name: Daily research
+
+on:
+  schedule:
+    # 06:00 UTC, two hours ahead of the weekly summary so Sunday's findings
+    # have landed before the summary reads them.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "Run date (YYYY-MM-DD). Blank for today."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+# Never two research passes at once: they would race on the same cache file and
+# on the push to main.
+concurrency:
+  group: migaki-daily
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: research/package-lock.json
+
+      - name: Install
+        working-directory: research
+        run: npm ci
+
+      - name: Build
+        working-directory: research
+        run: npm run build
+
+      # A failed pass still writes the day's file with an error recorded, and
+      # that is worth committing — a week that looks quiet because the research
+      # broke must not be indistinguishable from a genuinely quiet one. So the
+      # failure is carried past the commit and reported at the end.
+      - name: Run the research pass
+        id: research
+        continue-on-error: true
+        working-directory: research
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MIGAKI_RUN_DATE: ${{ inputs.run_date }}
+        run: npm run daily
+
+      - name: Commit the day's findings
+        run: |
+          set -euo pipefail
+          git config user.name "migaki-research[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add research/cache
+          if git diff --cached --quiet; then
+            echo "No new findings to commit."
+            exit 0
+          fi
+
+          RUN_DATE="${{ inputs.run_date }}"
+          [ -n "$RUN_DATE" ] || RUN_DATE="$(date -u +%F)"
+          git commit -m "chore(research): findings for ${RUN_DATE}"
+
+          # The weekly job also pushes to main. Rebase rather than fail the day.
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main
+
+      - name: Report a failed pass
+        if: steps.research.outcome == 'failure'
+        run: |
+          echo "::error::One or both research passes failed. The day's file was committed with the error recorded; see the run health section of the next weekly summary."
+          exit 1
