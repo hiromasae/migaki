@@ -162,6 +162,12 @@ const requestCritique = async (code: string, stack: string | undefined): Promise
     model: MODEL,
     max_tokens: MAX_TOKENS,
     thinking: { type: "adaptive" },
+    // Effort defaults to `high`, which spent ~4,200 thinking tokens per review to
+    // produce a critique no longer or sharper than `medium` returns with almost
+    // none: 92s versus 19s, 8 flags versus 7. Reviews run inside an agent's tool
+    // call, and many MCP clients time out at 60s, so the latency is the binding
+    // constraint here rather than the marginal flag.
+    output_config: { effort: "medium" },
     system: [
       {
         type: "text",
