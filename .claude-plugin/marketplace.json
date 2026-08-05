@@ -3,7 +3,7 @@
   "owner": {
     "name": "Hiro"
   },
-  "description": "A marketplace for the migaki taste-sharpening plugin.",
+  "description": "A marketplace for the migaki sense-and-taste plugin.",
   "plugins": [
     {
       "name": "migaki",
