@@ -1,0 +1,13 @@
+{
+  "name": "migaki",
+  "owner": {
+    "name": "Hiro"
+  },
+  "description": "A marketplace for the migaki taste-sharpening plugin.",
+  "plugins": [
+    {
+      "name": "migaki",
+      "source": "./plugins/migaki"
+    }
+  ]
+}
