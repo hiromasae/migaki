@@ -7,9 +7,9 @@ you need.
 ## Visual treatment
 
 1. **Indigo-to-purple gradient as the brand.** `#6366F1 → #A855F7` (Tailwind
-   indigo-500 → purple-500) on hero, buttons, and logo is the default AI-startup
-   look of 2023–24. *Still right:* a brand that actually owns purple and uses it
-   flat, not as a gradient crutch.
+   indigo-500 → purple-500) on hero, buttons, and logo is the default
+   AI-startup look of 2023–24. *Still right:* a brand that actually owns
+   purple and uses it flat, not as a gradient crutch.
 2. **Glassmorphism everywhere.** `backdrop-blur` + translucent white cards on a
    gradient background signals template. Blur is expensive and kills text
    contrast. *Still right:* one overlay layer that genuinely floats over
