@@ -12,7 +12,9 @@ When an entry here conflicts with core principles, core wins.
    decoration, it's spent.
 2. **Warm neutrals, not pure black/white.** *(added 2026-08)* `#FAFAF9`-range
    paper whites and `#0A0A0A`–`#141414` near-blacks with a slight warm or cool
-   cast, consistently applied. Pure `#FFF`/`#000` reads unconsidered; a cast
+   cast, consistently applied. Keep the cast under ~4 points of RGB spread —
+   `#FAFAF9` spans 1, `#EFEBE4` spans 11 and reads as a beige theme rather
+   than a considered neutral. Pure `#FFF`/`#000` reads unconsidered; a cast
    reads chosen.
 3. **Hairline borders over shadows.** *(added 2026-08)* 1px borders at low
    contrast (`~8–12%` foreground opacity) separate surfaces; shadows are
@@ -51,7 +53,9 @@ When an entry here conflicts with core principles, core wins.
 11. **Editorial serif as product brand.** *(added 2026-08)* Display serifs
     (Tiempos, Reckless, GT Alpina class) for marketing and brand moments on
     software products — the deliberate anti-Inter move. Pair with a plain
-    UI sans for chrome.
+    UI sans for chrome. Requires a real display serif: `Georgia`, `Palatino`,
+    and bare `ui-serif` fall back to word-processor, not editorial. With no
+    webfont budget, use the sans and skip this entirely.
 12. **Large-but-medium display type.** *(added 2026-08)* Big sizes (56–96px)
     at weight 450–600 with tight leading (~1.05) and optical margin alignment.
     Confidence through mass, not thinness.
