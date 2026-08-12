@@ -92,6 +92,27 @@ still holds, it becomes `*(added YYYY-MM, re-checked YYYY-MM)*`.
 depend on. An entry with no `re-checked` has not been verified since it was
 written, and the absence is informative. Do not backfill stamps.
 
+## Routine setup
+
+The loop runs as a scheduled cloud routine. Its prompt stays deliberately
+short so that changing how the loop behaves means editing this file, not
+re-registering the routine:
+
+> Run the migaki research loop. Read `research/PROTOCOL.md` and follow it
+> exactly. Draw only on sources listed in `research/SOURCES.md`. Never edit
+> `core.md` and never commit to `main`.
+
+**Cadence: monthly.** Taste does not move weekly, and a faster loop mostly
+produces noise plus re-check churn. At monthly runs and a threshold of 8,
+expect a PR every second or third month.
+
+Prerequisites, both owner-side:
+
+1. This directory must exist on `main` — the routine clones the default
+   branch and cannot read an unmerged branch.
+2. The cloud environment needs GitHub write access to push `research-queue`
+   and open PRs.
+
 ## Hard rules
 
 - Never commit to `main`. Never force-push. Never merge your own PR.
