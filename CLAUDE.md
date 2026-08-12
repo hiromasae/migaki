@@ -26,6 +26,10 @@ migaki/
 ├── CLAUDE.md
 ├── .claude-plugin/
 │   └── marketplace.json      # points at ./plugins/migaki
+├── research/                 # repo tooling; NOT shipped with the plugin
+│   ├── PROTOCOL.md           # operating contract for the research loop
+│   ├── SOURCES.md            # the only sources the loop may read
+│   └── REJECTED.md           # declined proposals; never re-proposed
 └── plugins/
     └── migaki/
         ├── .claude-plugin/
@@ -38,7 +42,9 @@ migaki/
                 └── edge.md   # what reads as excellent right now
 ```
 
-Six tracked files, ~500 lines total. Keep it that way unless there's a reason.
+The plugin is six files, ~500 lines. Keep it that way unless there's a reason.
+`research/` is maintenance tooling, ships with nothing, and does not count
+against that budget — but it must never move under `plugins/migaki/`.
 
 ## The taste layer
 
@@ -90,6 +96,12 @@ description.
    current mark of confidence.
 ```
 
+Once an entry has been verified to still hold, the stamp gains a second date:
+`*(added 2026-08, re-checked 2027-02)*`. **`added` is never rewritten** — it
+is the age signal retirement judgments depend on. An entry carrying no
+`re-checked` has not been verified since it was written, and that absence is
+itself information. Never backfill stamps.
+
 Both files number continuously across their section headings — section breaks
 do not restart the count. Renumber the whole file when inserting mid-list.
 
@@ -106,6 +118,13 @@ The prose style is as much the product as the content. Match it.
 - **Be specific and falsifiable.** Name the hex, the pixel value, the font, the
   CSS property, the year a pattern peaked. `#6366F1 → #A855F7` beats "a purple
   gradient." Specificity is what makes the reference usable mid-task.
+- **Bound the interpretable word.** Specificity is not enough on its own — an
+  entry can name a hex and still leave its *tolerance* open. Find the adjective
+  an implementer has to fill in (*slight, subtle, quiet, barely visible*) and
+  give it a number or a range, or state what to do when its precondition is
+  unmet. Measured failure: "a slight warm cast" produced `#EFEBE4`; "the
+  Tiempos class" produced `Georgia`. See `research/PROTOCOL.md` for the full
+  gate.
 - **State the exception.** A flag without its "still right" case is a ban, and
   bans get ignored.
 - **No hedging and no lecturing.** The files assert. They do not explain design
@@ -120,6 +139,8 @@ The prose style is as much the product as the content. Match it.
 - Fix typos, formatting, wrapping, and numbering in any file
 - Restructure sections within a taste file
 - Edit `marketplace.json` and `plugin.json`
+- Edit anything under `research/` — the source list, the protocol, the
+  rejection ledger. These are tooling, not product.
 
 ## What requires approval before proceeding
 
