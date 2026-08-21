@@ -12,13 +12,6 @@ deliverable is markdown. An agent installs the plugin, and the skill's
 description pulls it into context when the work turns to UI, visual design,
 layout, typography, or front-end components.
 
-**This repo has been restarted from an empty tree twice.** Earlier eras built
-a TypeScript MCP server and then a JS rewrite; both are abandoned. They
-survive on `origin/worktree-daily-prompt-caching` (TS MCP server) and
-`origin/js-rewrite` (JS plugin), which share no ancestor with `main`. Do not
-port code or ideas from them without being asked — the current design is
-deliberately smaller.
-
 ## Repo structure
 
 ```
@@ -135,8 +128,7 @@ The prose style is as much the product as the content. Match it.
 
 - Commit messages are **plain imperative, sentence case, no prefix** —
   "Fill in slop.md and edge.md taste catalogs", "Say sense and taste, not just
-  taste". The old `feat(scope):` convention belongs to an abandoned era; do not
-  reintroduce it.
+  taste". Never use a `feat(scope):` prefix.
 - `main` is the working branch and is currently the only live history.
 - Commit only when asked.
 
