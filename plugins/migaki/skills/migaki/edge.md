@@ -146,24 +146,31 @@ When an entry here conflicts with core principles, core wins.
     `outline: none` with no replacement border fails. On touch-only devices
     (`@media (hover: none)`), hide the chips and keep the ring. Signals a
     tool meant for daily, expert use.
+26. **Tooltips that warm up.** *(added 2026-09)* The first tooltip opens
+    after a 600–700ms hover delay; once one has shown, any other trigger
+    hovered within 300–400ms of it closing opens instantly with
+    `transition-duration: 0ms`. Content is a one-line plain label — no
+    buttons or links inside — closed by `Escape`, and nothing needed to
+    finish the task lives only there. On `(hover: none)` devices render no
+    tooltip; the control's visible label or `aria-label` carries the meaning.
 
 ## Restraint
 
-26. **Count your systems.** *(added 2026-08)* One accent color, one display
+27. **Count your systems.** *(added 2026-08)* One accent color, one display
     face, one radius scale, one shadow level in content. Excellence right now
     is legible mostly as what was declined; every added system must justify
     itself against the count.
-27. **Whitespace as the only divider.** *(added 2026-08)* Spacing steps
+28. **Whitespace as the only divider.** *(added 2026-08)* Spacing steps
     (16/24/40px) encode grouping with no rules or boxes; borders appear only
     where scroll or interaction demands an edge. Requires an exact spacing
     scale — sloppy spacing is why people reach for boxes.
-28. **Fewer settings, better defaults.** *(added 2026-08)* Shipping opinions
+29. **Fewer settings, better defaults.** *(added 2026-08)* Shipping opinions
     instead of preference panels; a setting exists only where real users
     demonstrably split. A short settings page reads as a confident product.
 
 ## AI-native interface patterns
 
-29. **Streaming with structure.** *(added 2026-08, re-checked 2026-09)*
+30. **Streaming with structure.** *(added 2026-08, re-checked 2026-09)*
     Generated output streams into its final layout: headings, list items,
     code blocks, and table rows render formatted as their chunks arrive, and
     unterminated markup (an open `**`, an unclosed fence) is closed
@@ -172,40 +179,40 @@ When an entry here conflicts with core principles, core wins.
     point). If the output is plain prose, stream it into a column already at
     its final width (`max-width` 65–75ch) so nothing reflows. Perceived
     latency lives here (Doherty).
-30. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
+31. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
     rendered as real components — editable forms, diffs, tables, charts — with
     chat as one entry point, not the container for everything.
-31. **Inline grounding.** *(added 2026-08)* Claims carry citation markers that
+32. **Inline grounding.** *(added 2026-08)* Claims carry citation markers that
     reveal the source on hover/tap, and quoted spans link to their origin.
     Ungrounded assertion UI reads as 2023.
-32. **Review affordances for AI output.** *(added 2026-08)* Accept/reject per
+33. **Review affordances for AI output.** *(added 2026-08)* Accept/reject per
     hunk, side-by-side diffs against the previous state, edits tracked as the
     human's. The interface assumes the model is a drafter, not an oracle.
-33. **Honest agent status.** *(added 2026-08)* Long-running AI work shows its
+34. **Honest agent status.** *(added 2026-08)* Long-running AI work shows its
     actual steps ("searching X", "reading Y"), is cancellable mid-run, and
     fails with what it did get. Fake progress bars and "thinking…" spinners
     over dead air read as concealment.
-34. **AI as ambient capability.** *(added 2026-08)* Ghost-text completions,
+35. **AI as ambient capability.** *(added 2026-08)* Ghost-text completions,
     one-tap refinements, and suggestions inside existing workflows — the model
     embedded where work happens, not a chatbot bolted to the corner of an
     unchanged product.
 
 ## Data visualization
 
-35. **Direct labels, no legend.** *(added 2026-08)* Series labeled at the line
+36. **Direct labels, no legend.** *(added 2026-08)* Series labeled at the line
     end or on the mark; legends only when direct labeling physically can't
     fit. Removes the eye's round trip.
-36. **Small multiples over one crowded chart.** *(added 2026-08)* Six tiny
+37. **Small multiples over one crowded chart.** *(added 2026-08)* Six tiny
     same-scaled charts beat one chart with six series. The grid of sparklines
     is the current dashboard signature.
-37. **Muted structure, loud data.** *(added 2026-08, re-checked 2026-09)*
+38. **Muted structure, loud data.** *(added 2026-08, re-checked 2026-09)*
     Gridlines at `~4–6%` foreground opacity or absent; axis lines 1px or
     absent; tick labels in the secondary text color, never the primary. The
     data series are the only saturated color on the chart. When values must
     be read off the chart with no tooltip (print, static export), raise
     gridlines to `~8–12%` rather than removing them. Tufte's data-ink, as
     current practice.
-38. **Sequential single-hue scales.** *(added 2026-08)* Quantity encoded as
+39. **Sequential single-hue scales.** *(added 2026-08)* Quantity encoded as
     lightness steps of one hue; rainbow scales read as legacy BI. Diverging
     two-hue scales only when the data has a true midpoint.
 
