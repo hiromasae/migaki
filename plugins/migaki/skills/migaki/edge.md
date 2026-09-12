@@ -10,12 +10,14 @@ When an entry here conflicts with core principles, core wins.
    the whole UI; a single accent appears only on interactive or semantic
    elements, so color always means something. If the accent shows up on
    decoration, it's spent.
-2. **Warm neutrals, not pure black/white.** *(added 2026-08)* `#FAFAF9`-range
-   paper whites and `#0A0A0A`–`#141414` near-blacks with a slight warm or cool
-   cast, consistently applied. Keep the cast under ~4 points of RGB spread —
-   `#FAFAF9` spans 1, `#EFEBE4` spans 11 and reads as a beige theme rather
-   than a considered neutral. Pure `#FFF`/`#000` reads unconsidered; a cast
-   reads chosen.
+2. **Warm neutrals, not pure black/white.** *(added 2026-08)* Paper whites
+   whose lowest RGB channel sits at `F4`–`FA` (`#F7F7F4`, `#FAFAF9`) and
+   near-blacks whose highest channel sits at `07`–`14` (`#08090A`,
+   `#14120B`), with the cast consistently applied. On whites keep the cast
+   under ~4 points of RGB spread — `#FAFAF9` spans 1, `#EFEBE4` spans 11 and
+   reads as a beige theme rather than a considered neutral. Near-blacks
+   tolerate up to ~9 points (`#14120B` spans 9): a cast shows less at low
+   lightness. Pure `#FFF`/`#000` reads unconsidered; a cast reads chosen.
 3. **Hairline borders over shadows.** *(added 2026-08)* 1px borders at low
    contrast (`~8–12%` foreground opacity) separate surfaces; shadows are
    reserved for true elevation (popovers, modals). Flat + hairline is the
