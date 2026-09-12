@@ -73,19 +73,26 @@ When an entry here conflicts with core principles, core wins.
 15. **Type-only heroes.** *(added 2026-08)* No illustration: the headline set
     large in the brand face *is* the visual. Works only when the sentence is
     strong enough to carry it — which disciplines the copy too.
+16. **Hung opening quotes.** *(added 2026-09)* Pull quotes and testimonials
+    set at 24px and up place the opening `“` outside the text column, so the
+    first letter sits on the column edge: `text-indent: -0.4em` to `-0.45em`
+    on the quote block. `hanging-punctuation: first` does the same where
+    supported; wrap it in `@supports (hanging-punctuation: first)` and drop
+    the indent inside that block, keeping the indent as the fallback
+    everywhere else. Below 24px, leave the mark flush.
 
 ## Iconography & illustration
 
-16. **One set, one weight, fewer icons.** *(added 2026-08)* A single stroke
+17. **One set, one weight, fewer icons.** *(added 2026-08)* A single stroke
     weight across the product, icons only where they beat words (dense
     toolbars, repeated categories). Where a label fits, the label wins.
-17. **Diagrams as illustration.** *(added 2026-08)* Real architecture
+18. **Diagrams as illustration.** *(added 2026-08)* Real architecture
     diagrams, annotated screenshots, and schematic drawings in brand style as
     the marketing art. Explains while it decorates; unfakeable by template.
 
 ## Motion
 
-18. **Motion only on state change.** *(added 2026-08)* Enter/exit/reorder
+19. **Motion only on state change.** *(added 2026-08)* Enter/exit/reorder
     animate at 100–250ms ease-out, with 300ms as the ceiling for modals;
     nothing animates on scroll. Animate only `transform` and `opacity`,
     never `all` or layout properties. Popovers enter from `scale(0.9–0.97)`,
@@ -96,7 +103,7 @@ When an entry here conflicts with core principles, core wins.
     menus, and anything opened by a keyboard shortcut appear at 0ms. Motion's
     job is explaining what changed, and `prefers-reduced-motion` is honored
     by default.
-19. **Springs for direct manipulation.** *(added 2026-08)* Drag, dismiss, and
+20. **Springs for direct manipulation.** *(added 2026-08)* Drag, dismiss, and
     reorder track the pointer 1:1 with `transition: none` while held, and
     past their bounds move logarithmically slower instead of hard-stopping
     (Vaul: `8 × (ln(overshoot + 1) − 2)`px). On release, commit on distance
@@ -107,14 +114,14 @@ When an entry here conflicts with core principles, core wins.
     grabs the element where it is. Destructive dismissals commit on release,
     never mid-gesture. A release that checks distance but ignores throw speed
     reads as canned.
-20. **Shared-element continuity.** *(added 2026-08)* View Transitions
+21. **Shared-element continuity.** *(added 2026-08)* View Transitions
     API/shared-element morphs between list and detail, so navigation reads as
     the same object moving rather than a page swap. Use for hierarchy
     navigation, not for every route.
 
 ## Component patterns
 
-21. **Command palette as real navigation.** *(added 2026-08)* Cmd+K reaching
+22. **Command palette as real navigation.** *(added 2026-08)* Cmd+K reaching
     every action and entity, with keyboard hints shown inline in menus.
     Matching is ranked, not substring: typed characters match in order with
     gaps allowed, word-start hits outrank mid-word ones, and each item
@@ -122,10 +129,10 @@ When an entry here conflicts with core principles, core wins.
     move the selection, which scrolls into view with `block: 'nearest'`. The
     palette opens at 0ms. The edge version is depth — palettes that only
     search four pages read as checkbox.
-22. **Inline editing over modals.** *(added 2026-08)* Click-to-edit in place,
+23. **Inline editing over modals.** *(added 2026-08)* Click-to-edit in place,
     save on blur, no dialog for single-field changes. Modals reserved for
     genuinely branching flows.
-23. **Optimistic UI with undo.** *(added 2026-08)* Mutations apply instantly,
+24. **Optimistic UI with undo.** *(added 2026-08)* Mutations apply instantly,
     a toast offers undo for ~8s, rollback on failure. The toast sits in a
     screen corner with no backdrop, stays out of the tab order (reachable by
     a shortcut — Sonner uses `Alt+T`), and stacks at most 3 deep; its
@@ -134,10 +141,10 @@ When an entry here conflicts with core principles, core wins.
     (`document.visibilityState`). Replaces confirmation dialogs everywhere
     destruction is reversible; where the server cannot reverse it, keep the
     dialog.
-24. **Empty states that demonstrate.** *(added 2026-08)* First-run screens
+25. **Empty states that demonstrate.** *(added 2026-08)* First-run screens
     showing populated example data (clearly labeled) with one creation action
     — the product teaches by showing its full state, not a gray illustration.
-25. **Keyboard affordances made visible.** *(added 2026-08)* Shortcut chips in
+26. **Keyboard affordances made visible.** *(added 2026-08)* Shortcut chips in
     buttons and menu rows (`⌘⏎`, `G then I`), and a focus ring that is
     specified rather than suppressed: `outline: 2px solid` in the accent at
     3:1 or better against the adjacent surface, `outline-offset: 2px`, shown
@@ -146,7 +153,7 @@ When an entry here conflicts with core principles, core wins.
     `outline: none` with no replacement border fails. On touch-only devices
     (`@media (hover: none)`), hide the chips and keep the ring. Signals a
     tool meant for daily, expert use.
-26. **Tooltips that warm up.** *(added 2026-09)* The first tooltip opens
+27. **Tooltips that warm up.** *(added 2026-09)* The first tooltip opens
     after a 600–700ms hover delay; once one has shown, any other trigger
     hovered within 300–400ms of it closing opens instantly with
     `transition-duration: 0ms`. Content is a one-line plain label — no
@@ -156,21 +163,21 @@ When an entry here conflicts with core principles, core wins.
 
 ## Restraint
 
-27. **Count your systems.** *(added 2026-08)* One accent color, one display
+28. **Count your systems.** *(added 2026-08)* One accent color, one display
     face, one radius scale, one shadow level in content. Excellence right now
     is legible mostly as what was declined; every added system must justify
     itself against the count.
-28. **Whitespace as the only divider.** *(added 2026-08)* Spacing steps
+29. **Whitespace as the only divider.** *(added 2026-08)* Spacing steps
     (16/24/40px) encode grouping with no rules or boxes; borders appear only
     where scroll or interaction demands an edge. Requires an exact spacing
     scale — sloppy spacing is why people reach for boxes.
-29. **Fewer settings, better defaults.** *(added 2026-08)* Shipping opinions
+30. **Fewer settings, better defaults.** *(added 2026-08)* Shipping opinions
     instead of preference panels; a setting exists only where real users
     demonstrably split. A short settings page reads as a confident product.
 
 ## AI-native interface patterns
 
-30. **Streaming with structure.** *(added 2026-08, re-checked 2026-09)*
+31. **Streaming with structure.** *(added 2026-08, re-checked 2026-09)*
     Generated output streams into its final layout: headings, list items,
     code blocks, and table rows render formatted as their chunks arrive, and
     unterminated markup (an open `**`, an unclosed fence) is closed
@@ -179,40 +186,40 @@ When an entry here conflicts with core principles, core wins.
     point). If the output is plain prose, stream it into a column already at
     its final width (`max-width` 65–75ch) so nothing reflows. Perceived
     latency lives here (Doherty).
-31. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
+32. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
     rendered as real components — editable forms, diffs, tables, charts — with
     chat as one entry point, not the container for everything.
-32. **Inline grounding.** *(added 2026-08)* Claims carry citation markers that
+33. **Inline grounding.** *(added 2026-08)* Claims carry citation markers that
     reveal the source on hover/tap, and quoted spans link to their origin.
     Ungrounded assertion UI reads as 2023.
-33. **Review affordances for AI output.** *(added 2026-08)* Accept/reject per
+34. **Review affordances for AI output.** *(added 2026-08)* Accept/reject per
     hunk, side-by-side diffs against the previous state, edits tracked as the
     human's. The interface assumes the model is a drafter, not an oracle.
-34. **Honest agent status.** *(added 2026-08)* Long-running AI work shows its
+35. **Honest agent status.** *(added 2026-08)* Long-running AI work shows its
     actual steps ("searching X", "reading Y"), is cancellable mid-run, and
     fails with what it did get. Fake progress bars and "thinking…" spinners
     over dead air read as concealment.
-35. **AI as ambient capability.** *(added 2026-08)* Ghost-text completions,
+36. **AI as ambient capability.** *(added 2026-08)* Ghost-text completions,
     one-tap refinements, and suggestions inside existing workflows — the model
     embedded where work happens, not a chatbot bolted to the corner of an
     unchanged product.
 
 ## Data visualization
 
-36. **Direct labels, no legend.** *(added 2026-08)* Series labeled at the line
+37. **Direct labels, no legend.** *(added 2026-08)* Series labeled at the line
     end or on the mark; legends only when direct labeling physically can't
     fit. Removes the eye's round trip.
-37. **Small multiples over one crowded chart.** *(added 2026-08)* Six tiny
+38. **Small multiples over one crowded chart.** *(added 2026-08)* Six tiny
     same-scaled charts beat one chart with six series. The grid of sparklines
     is the current dashboard signature.
-38. **Muted structure, loud data.** *(added 2026-08, re-checked 2026-09)*
+39. **Muted structure, loud data.** *(added 2026-08, re-checked 2026-09)*
     Gridlines at `~4–6%` foreground opacity or absent; axis lines 1px or
     absent; tick labels in the secondary text color, never the primary. The
     data series are the only saturated color on the chart. When values must
     be read off the chart with no tooltip (print, static export), raise
     gridlines to `~8–12%` rather than removing them. Tufte's data-ink, as
     current practice.
-39. **Sequential single-hue scales.** *(added 2026-08)* Quantity encoded as
+40. **Sequential single-hue scales.** *(added 2026-08)* Quantity encoded as
     lightness steps of one hue; rainbow scales read as legacy BI. Diverging
     two-hue scales only when the data has a true midpoint.
 
