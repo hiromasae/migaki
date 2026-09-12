@@ -126,8 +126,14 @@ When an entry here conflicts with core principles, core wins.
     save on blur, no dialog for single-field changes. Modals reserved for
     genuinely branching flows.
 23. **Optimistic UI with undo.** *(added 2026-08)* Mutations apply instantly,
-    a quiet toast offers undo for ~8s, rollback on failure. Replaces
-    confirmation dialogs everywhere destruction is reversible.
+    a toast offers undo for ~8s, rollback on failure. The toast sits in a
+    screen corner with no backdrop, stays out of the tab order (reachable by
+    a shortcut — Sonner uses `Alt+T`), and stacks at most 3 deep; its
+    countdown pauses while the pointer is over the stack, while the stack is
+    opened from the keyboard, and while the tab is hidden
+    (`document.visibilityState`). Replaces confirmation dialogs everywhere
+    destruction is reversible; where the server cannot reverse it, keep the
+    dialog.
 24. **Empty states that demonstrate.** *(added 2026-08)* First-run screens
     showing populated example data (clearly labeled) with one creation action
     — the product teaches by showing its full state, not a gray illustration.
