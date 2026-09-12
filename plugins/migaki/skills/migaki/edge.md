@@ -163,9 +163,14 @@ When an entry here conflicts with core principles, core wins.
 
 ## AI-native interface patterns
 
-29. **Streaming with structure.** *(added 2026-08)* Generated output streams
-    into its final layout (headings, cards, table rows appearing in place),
-    not as a raw text wall that reflows into shape at the end. Perceived
+29. **Streaming with structure.** *(added 2026-08, re-checked 2026-09)*
+    Generated output streams into its final layout: headings, list items,
+    code blocks, and table rows render formatted as their chunks arrive, and
+    unterminated markup (an open `**`, an unclosed fence) is closed
+    provisionally rather than shown raw. Once a block is complete it does not
+    move or resize when the stream ends (0px shift above the insertion
+    point). If the output is plain prose, stream it into a column already at
+    its final width (`max-width` 65–75ch) so nothing reflows. Perceived
     latency lives here (Doherty).
 30. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
     rendered as real components — editable forms, diffs, tables, charts — with
