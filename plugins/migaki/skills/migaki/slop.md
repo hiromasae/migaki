@@ -82,9 +82,13 @@ you need.
     ("FEATURES", "TESTIMONIALS") above every H2 is template scaffolding — it
     labels structure instead of communicating. *Still right:* one kicker where
     the category genuinely orients ("CASE STUDY").
-19. **tracking-tight on body text.** Negative letter-spacing below ~20px
-    degrades legibility; it was copied from display type where it belongs.
-    *Still right:* display sizes only — tighten above ~32px, never below.
+19. **tracking-tight on small text.** Tailwind's `tracking-tight`
+    (`-0.025em`) or tighter on text below 24px degrades legibility; it was
+    copied from display type where it belongs. *Still right:* at 24px and
+    up, `-0.01em` to `-0.06em`. Below 24px, running text may take down to
+    `-0.013em` and short headings or labels down to `-0.02em` — no tighter.
+    Those small-size values assume an Inter, Geist, or Söhne-class sans;
+    for any other face, keep `0` below 24px.
 20. **The Playfair + Inter pairing.** (Or: Space Grotesk for anything "tech.")
     These pairings are the first result for "elegant font combo" and read as
     exactly that. *Still right:* if the serif is doing editorial work across
