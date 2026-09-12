@@ -198,9 +198,13 @@ When an entry here conflicts with core principles, core wins.
 36. **Small multiples over one crowded chart.** *(added 2026-08)* Six tiny
     same-scaled charts beat one chart with six series. The grid of sparklines
     is the current dashboard signature.
-37. **Muted structure, loud data.** *(added 2026-08)* Gridlines at barely
-    visible contrast or absent, axes thin and gray, the data series the only
-    saturated thing. Tufte's data-ink, as current practice.
+37. **Muted structure, loud data.** *(added 2026-08, re-checked 2026-09)*
+    Gridlines at `~4–6%` foreground opacity or absent; axis lines 1px or
+    absent; tick labels in the secondary text color, never the primary. The
+    data series are the only saturated color on the chart. When values must
+    be read off the chart with no tooltip (print, static export), raise
+    gridlines to `~8–12%` rather than removing them. Tufte's data-ink, as
+    current practice.
 38. **Sequential single-hue scales.** *(added 2026-08)* Quantity encoded as
     lightness steps of one hue; rainbow scales read as legacy BI. Diverging
     two-hue scales only when the data has a true midpoint.
