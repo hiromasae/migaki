@@ -63,10 +63,14 @@ you need.
 
 ## Typography
 
-15. **Gradient text on headlines.** `background-clip: text` over the brand
-    gradient — the single strongest 2023-AI tell. Also breaks on selection and
-    in forced-colors mode. *Still right:* at most one hero moment, on a brand
-    that owns the gradient elsewhere.
+15. **Gradient text on headlines.** `background-clip: text` over a gradient
+    that crosses two or more hues — the brand gradient on the headline is
+    the single strongest 2023-AI tell. Also breaks on selection and in
+    forced-colors mode. *Still right:* at most one hero moment, on a brand
+    that owns the gradient elsewhere; a one-hue lightness fade (`#FFF` →
+    `#FFFFFF80`, `#555` → `#000`) whose faded end still clears 4.5:1
+    contrast; or a shimmer sweep across loading text. In every case, reset
+    to a solid `color` under `@media (forced-colors: active)`.
 16. **Inter as the brand voice.** Inter is a fine UI workhorse; using it for
     display/marketing type signals "no typographic decision was made." *Still
     right:* product chrome, dashboards, anything where type should disappear.
