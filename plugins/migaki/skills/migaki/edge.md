@@ -62,8 +62,10 @@ When an entry here conflicts with core principles, core wins.
     `Palatino`, and bare `ui-serif` fall back to word-processor, not
     editorial. With no webfont budget, use the sans and skip this entirely.
 12. **Large-but-medium display type.** *(added 2026-08)* Big sizes (56–96px)
-    at weight 450–600 with tight leading (~1.05) and optical margin alignment.
-    Confidence through mass, not thinness.
+    at weight 450–600, line-height 1.0–1.15, and letter-spacing of `-0.02em`
+    to `-0.06em` for sans faces (`-0.01em` or `0` for serifs). Confidence
+    through mass, not thinness. In-between weights like 450 and 510 need a
+    variable font; with static weights only, use 500.
 13. **Monospace doing real work.** *(added 2026-08)* Mono for identifiers,
     paths, amounts, and timestamps — with `font-variant-numeric: tabular-nums`
     so columns of figures align. Mono as data signal, not as costume.
