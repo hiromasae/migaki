@@ -115,9 +115,13 @@ When an entry here conflicts with core principles, core wins.
 ## Component patterns
 
 21. **Command palette as real navigation.** *(added 2026-08)* Cmd+K reaching
-    every action and entity, with keyboard hints shown inline in menus. The
-    edge version is depth — palettes that only search four pages read as
-    checkbox.
+    every action and entity, with keyboard hints shown inline in menus.
+    Matching is ranked, not substring: typed characters match in order with
+    gaps allowed, word-start hits outrank mid-word ones, and each item
+    carries aliases so "remove" finds Delete. Arrow keys and `ctrl+n`/`p`
+    move the selection, which scrolls into view with `block: 'nearest'`. The
+    palette opens at 0ms. The edge version is depth — palettes that only
+    search four pages read as checkbox.
 22. **Inline editing over modals.** *(added 2026-08)* Click-to-edit in place,
     save on blur, no dialog for single-field changes. Modals reserved for
     genuinely branching flows.
