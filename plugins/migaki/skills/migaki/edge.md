@@ -86,9 +86,16 @@ When an entry here conflicts with core principles, core wins.
 ## Motion
 
 18. **Motion only on state change.** *(added 2026-08)* Enter/exit/reorder
-    animate at 120–200ms ease-out; nothing animates on scroll. Motion's job is
-    explaining what changed, and `prefers-reduced-motion` is honored by
-    default.
+    animate at 100–250ms ease-out, with 300ms as the ceiling for modals;
+    nothing animates on scroll. Animate only `transform` and `opacity`,
+    never `all` or layout properties. Popovers enter from `scale(0.9–0.97)`,
+    never `scale(0)`, with `transform-origin` at the trigger — use the
+    primitive's variable (Radix `--radix-*-transform-origin`, Base UI
+    `--transform-origin`); without one, set the origin to the side facing the
+    trigger (`top` for a menu opening below it). Command palettes, context
+    menus, and anything opened by a keyboard shortcut appear at 0ms. Motion's
+    job is explaining what changed, and `prefers-reduced-motion` is honored
+    by default.
 19. **Springs for direct manipulation.** *(added 2026-08)* Drag, dismiss, and
     reorder follow the finger/cursor with spring physics (no fixed duration);
     interruptible mid-flight. Fixed-duration eases on manipulated objects now
