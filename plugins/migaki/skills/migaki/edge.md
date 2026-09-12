@@ -18,8 +18,9 @@ When an entry here conflicts with core principles, core wins.
    reads as a beige theme rather than a considered neutral. Near-blacks
    tolerate up to ~9 points (`#14120B` spans 9): a cast shows less at low
    lightness. Pure `#FFF`/`#000` reads unconsidered; a cast reads chosen.
-3. **Hairline borders over shadows.** *(added 2026-08)* 1px borders at low
-   contrast (`~8–12%` foreground opacity) separate surfaces; shadows are
+3. **Hairline borders over shadows.** *(added 2026-08, re-checked 2026-09)*
+   1px borders at `5–14%` foreground opacity (`#0000000D`–`#00000024` on
+   light, `#FFFFFF0D`–`#FFFFFF24` on dark) separate surfaces; shadows are
    reserved for true elevation (popovers, modals). Flat + hairline is the
    current mark of confidence.
 4. **Dark mode designed, not inverted.** *(added 2026-08)* Separate dark
