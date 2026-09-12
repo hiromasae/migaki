@@ -138,8 +138,14 @@ When an entry here conflicts with core principles, core wins.
     showing populated example data (clearly labeled) with one creation action
     — the product teaches by showing its full state, not a gray illustration.
 25. **Keyboard affordances made visible.** *(added 2026-08)* Shortcut chips in
-    buttons and menu rows (`⌘⏎`, `G then I`), focus rings that are designed
-    rather than suppressed. Signals a tool meant for daily, expert use.
+    buttons and menu rows (`⌘⏎`, `G then I`), and a focus ring that is
+    specified rather than suppressed: `outline: 2px solid` in the accent at
+    3:1 or better against the adjacent surface, `outline-offset: 2px`, shown
+    on `:focus-visible` only so mouse clicks don't trigger it. Where a scroll
+    or overflow container would clip it, inset it (`outline-offset: -2px`).
+    `outline: none` with no replacement border fails. On touch-only devices
+    (`@media (hover: none)`), hide the chips and keep the ring. Signals a
+    tool meant for daily, expert use.
 
 ## Restraint
 
