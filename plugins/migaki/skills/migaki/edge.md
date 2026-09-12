@@ -53,12 +53,14 @@ When an entry here conflicts with core principles, core wins.
 
 ## Typography
 
-11. **Editorial serif as product brand.** *(added 2026-08)* Display serifs
-    (Tiempos, Reckless, GT Alpina class) for marketing and brand moments on
-    software products — the deliberate anti-Inter move. Pair with a plain
-    UI sans for chrome. Requires a real display serif: `Georgia`, `Palatino`,
-    and bare `ui-serif` fall back to word-processor, not editorial. With no
-    webfont budget, use the sans and skip this entirely.
+11. **Editorial serif as product brand.**
+    *(added 2026-08, re-checked 2026-09)* Display serifs (Tiempos, Reckless,
+    GT Alpina, Domaine class) at weight 400 or heavier and 32px and up, for
+    marketing headlines and brand moments on software products — the
+    deliberate anti-Inter move. Pair with a plain UI sans for chrome, body,
+    buttons, and navigation. Requires a real display serif: `Georgia`,
+    `Palatino`, and bare `ui-serif` fall back to word-processor, not
+    editorial. With no webfont budget, use the sans and skip this entirely.
 12. **Large-but-medium display type.** *(added 2026-08)* Big sizes (56–96px)
     at weight 450–600 with tight leading (~1.05) and optical margin alignment.
     Confidence through mass, not thinness.
