@@ -22,8 +22,15 @@ research target and no run may open it for editing.
 
 1. **Reconcile.** Read `research/REJECTED.md`. Then check for research PRs
    closed since the last run: anything proposed but absent from `main` was
-   rejected — append it to `REJECTED.md` with the date and move on. Never
-   re-propose a logged rejection.
+   rejected — append it to `REJECTED.md` with the date. Never re-propose a
+   logged rejection.
+
+   When a research PR has closed, merged or not, start the queue over before
+   anything else: delete `research-queue`, recreate it from `main`, and make
+   that `REJECTED.md` append its first commit. Everything the old branch
+   carried is now on `main` or in the ledger, and its stale commits would
+   conflict with the next run. Deleting and recreating is not a force-push.
+   The ledger commit does not count toward the threshold.
 2. **Re-check.** Take the six entries in `edge.md` with the oldest stamps.
    For each, confirm against Tier 1–2 sources that it still holds. Stamp the
    survivors; propose retirement for the rest.
