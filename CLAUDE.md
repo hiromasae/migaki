@@ -35,7 +35,7 @@ migaki/
                 └── edge.md   # what reads as excellent right now
 ```
 
-The plugin is six files, ~500 lines. Keep it that way unless there's a reason.
+The plugin is six files, ~570 lines. Keep it that way unless there's a reason.
 `research/` is maintenance tooling, ships with nothing, and does not count
 against that budget — but it must never move under `plugins/migaki/`.
 
@@ -83,10 +83,11 @@ what it signals, and the case where it's still correct.
 description.
 
 ```markdown
-3. **Hairline borders over shadows.** *(added 2026-08)* 1px borders at low
-   contrast (`~8–12%` foreground opacity) separate surfaces; shadows are
-   reserved for true elevation (popovers, modals). Flat + hairline is the
-   current mark of confidence.
+3. **Hairline borders over shadows.** *(added 2026-08)* 1px borders at
+   `8–14%` foreground opacity on light (`#00000014`–`#00000024`) and `5–14%`
+   on dark (`#FFFFFF0D`–`#FFFFFF24`) separate surfaces; shadows are reserved
+   for true elevation (popovers, modals). Flat + hairline is the current mark
+   of confidence.
 ```
 
 Once an entry has been verified to still hold, the stamp gains a second date:
@@ -100,6 +101,10 @@ do not restart the count. Renumber the whole file when inserting mid-list.
 
 Entries are independent by design; an agent pulls the one it needs. Never write
 an entry that only makes sense after reading a neighbor.
+
+An entry runs eight lines at most, title line included. Bounding every word
+lengthens entries, and past eight lines one reads as a spec rather than a
+taste call. Entries already over the cap are trimmed when next edited.
 
 ## Writing conventions
 
