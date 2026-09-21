@@ -105,16 +105,13 @@ When an entry here conflicts with core principles, core wins.
     by a keyboard shortcut appear at 0ms. Motion's job is explaining what
     changed, and `prefers-reduced-motion` is honored by default.
 20. **Springs for direct manipulation.** *(added 2026-08)* Drag, dismiss, and
-    reorder track the pointer 1:1 with `transition: none` while held, and
-    past their bounds move logarithmically slower instead of hard-stopping
-    (Vaul: `8 × (ln(overshoot + 1) − 2)`px). On release, commit on distance
-    *or* flick: dismiss past 25% of a sheet's size (45px for a toast), or
-    above a release velocity of ~0.4px/ms for sheets and ~0.11px/ms for
-    toasts. Settle with a spring; without a spring library, use
-    `cubic-bezier(0.32, 0.72, 0, 1)` over 500ms. A press during the settle
-    grabs the element where it is. Destructive dismissals commit on release,
-    never mid-gesture. A release that checks distance but ignores throw speed
-    reads as canned.
+    reorder track the pointer 1:1 with `transition: none` while held. On
+    release, commit on distance *or* flick: dismiss past 25% of a sheet's
+    size (45px for a toast), or at a release speed above ~0.4px/ms for
+    sheets and ~0.11px/ms for toasts. Settle with a spring, interruptible
+    mid-flight; with no spring library, use `cubic-bezier(0.32, 0.72, 0, 1)`
+    over 500ms. Destructive dismissals commit on release, never mid-gesture. A
+    release that checks distance but ignores throw speed reads as canned.
 21. **Shared-element continuity.** *(added 2026-08)* View Transitions
     API/shared-element morphs between list and detail, so navigation reads as
     the same object moving rather than a page swap. Use for hierarchy
