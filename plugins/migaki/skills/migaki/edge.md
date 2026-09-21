@@ -182,7 +182,7 @@ When an entry here conflicts with core principles, core wins.
     provisionally rather than shown raw. Once a block is complete it does not
     move or resize when the stream ends (0px shift above the insertion
     point). If the output is plain prose, stream it into a column already at
-    its final width (`max-width` 65–75ch) so nothing reflows. Perceived
+    its final width (`max-width: 65ch`) so nothing reflows. Perceived
     latency lives here (Doherty).
 32. **Generative UI over chat transcripts.** *(added 2026-08)* Model output
     rendered as real components — editable forms, diffs, tables, charts — with
