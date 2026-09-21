@@ -19,9 +19,9 @@ When an entry here conflicts with core principles, core wins.
    tolerate up to ~9 points (`#14120B` spans 9): a cast shows less at low
    lightness. Pure `#FFF`/`#000` reads unconsidered; a cast reads chosen.
 3. **Hairline borders over shadows.** *(added 2026-08, re-checked 2026-09)*
-   1px borders at `5–14%` foreground opacity (`#0000000D`–`#00000024` on
-   light, `#FFFFFF0D`–`#FFFFFF24` on dark) separate surfaces; shadows are
-   reserved for true elevation (popovers, modals). Flat + hairline is the
+   1px borders at `8–14%` foreground opacity on light (`#00000014`–`#00000024`)
+   and `5–14%` on dark (`#FFFFFF0D`–`#FFFFFF24`) separate surfaces; shadows
+   are reserved for true elevation (popovers, modals). Flat + hairline is the
    current mark of confidence.
 4. **Dark mode designed, not inverted.** *(added 2026-08)* Separate dark
    palette: desaturated accents (saturated hues vibrate on dark), elevation via
