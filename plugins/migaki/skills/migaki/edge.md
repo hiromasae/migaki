@@ -69,7 +69,7 @@ When an entry here conflicts with core principles, core wins.
 13. **Monospace doing real work.** *(added 2026-08)* Mono for identifiers,
     paths, amounts, and timestamps — with `font-variant-numeric: tabular-nums`
     so columns of figures align. Mono as data signal, not as costume.
-14. **Few sizes, strict scale.** *(added 2026-08)* Five to seven body and
+14. **Strict scale, named sizes.** *(added 2026-08)* Five to seven body and
     label sizes between 10px and 24px, plus a separate heading scale of at
     most ten steps; every size in the product is one of those named tokens.
     A size outside the token set — an arbitrary `text-[15px]` — is visible
