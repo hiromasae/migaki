@@ -25,6 +25,10 @@ research target and no run may open it for editing.
    rejected — append it to `REJECTED.md` with the date. Never re-propose a
    logged rejection.
 
+   An entry the owner edited on the PR branch before merging was accepted,
+   not rejected. Log only the specific bound or clause the edit removed —
+   "the Vaul overshoot formula", not the whole proposal.
+
    When a research PR has closed, merged or not, start the queue over before
    anything else: delete `research-queue`, recreate it from `main`, and make
    that `REJECTED.md` append its first commit. Everything the old branch
@@ -47,7 +51,9 @@ research target and no run may open it for editing.
 
 - **Already present** — discard silently. No commit, no note.
 - **Sharpens an existing entry** — propose an edit, not a new entry. This is
-  the preferred outcome; the corpus improves without growing.
+  the preferred outcome; the corpus improves without gaining entries. It
+  still gains lines: in the first run, 14 sharpenings added 56 lines and two
+  new entries added 14. The length cap in the entry spec is the counterweight.
 - **Genuinely new** — propose an addition, subject to the entry spec.
 - **Saturated** — the pattern is in `edge.md` but now appears everywhere.
   Propose a move to Retirement watch, or to `slop.md` if it is fully spent.
@@ -57,19 +63,25 @@ is a good run.
 
 ## Entry spec
 
-Every proposed entry must pass all four. This is a hard gate: an entry that
+Every proposed entry must pass all five. This is a hard gate: an entry that
 fails is not proposed, even if the underlying observation is correct.
 
 1. **No unbounded interpretable word.** Any adjective an implementer has to
    fill in — *slight, subtle, barely visible, quiet, tight, large, low* —
-   carries a number or a range. `edge.md` #3 is the model: "`~8–12%`
-   foreground opacity", never "low contrast".
+   carries a number or a range. `edge.md` #3 is the model: "`8–14%`
+   foreground opacity on light", never "low contrast".
 2. **A named fallback for every precondition.** If the entry depends on
    something that may be unavailable — a webfont, a browser API, real data
    density — state what to do when it is not. `edge.md` #11 is the model.
 3. **Standalone.** Comprehensible without reading a neighbouring entry.
 4. **Falsifiable.** Names the hex, pixel value, duration, weight, CSS
    property, or year. A reader can check whether output complies.
+5. **Eight lines at most.** Counted at the 79-character wrap, title line
+   included. Checks 1 and 2 both lengthen an entry, and an agent pulls one
+   entry mid-task and surfaces it in a line or two — an 11-line entry is a
+   spec, not a taste call. When the bounds do not fit, keep the rule an
+   implementer needs and cut the library-specific constant. An entry already
+   over the cap is trimmed when it is next sharpened, not before.
 
 **Self-check, stated in the commit body:** for each proposed entry, name the
 word an implementer could get wrong, and the bound that stops them. If no
