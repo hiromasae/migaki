@@ -12,8 +12,8 @@ When an entry here conflicts with core principles, core wins.
    decoration, it's spent.
 2. **Warm neutrals, not pure black/white.** *(added 2026-08)* Paper whites
    whose lowest RGB channel sits at `F4`–`FA` (`#F7F7F4`, `#FAFAF9`) and
-   near-blacks whose highest channel sits at `07`–`14` (`#08090A`,
-   `#14120B`), with the cast consistently applied. On whites keep the cast
+   near-blacks whose highest channel sits at `07`–`14` (`#08090A`, `#14120B`),
+   with a warm or cool cast, consistently applied. On whites keep the cast
    under ~4 points of RGB spread — `#FAFAF9` spans 1, `#EFEBE4` spans 11 and
    reads as a beige theme rather than a considered neutral. Near-blacks
    tolerate up to ~9 points (`#14120B` spans 9): a cast shows less at low
