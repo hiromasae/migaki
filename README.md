@@ -22,9 +22,9 @@ task needs, not all three — and applies what it finds.
 - **`core.md`** — timeless perceptual principles, grounded in named laws
   (Fitts, Hick, Jakob, Miller, Nielsen, Norman, Tufte). Organized into four
   tiers under one meta-principle: minimize cognitive load.
-- **`slop.md`** — patterns that read as AI-generated, low-effort, or dated.
-  Every entry is a flag, not a ban, and names the case where the pattern is
-  still the right call.
+- **`slop.md`** — patterns that read as AI-generated, low-effort, or dated,
+  in the visuals and in the marketing copy on the page. Every entry is a flag,
+  not a ban, and names the case where the pattern is still the right call.
 - **`edge.md`** — what reads as excellent right now. Every entry carries a
   date stamp so staleness is visible, and a Retirement watch section tracks
   patterns drifting toward slop.
