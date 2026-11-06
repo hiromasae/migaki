@@ -1,11 +1,11 @@
-# migaki — Claude Code Handbook
+# ui-polish — Claude Code Handbook
 
 ## What this project is
 
-migaki (磨き — "to polish") is a **Claude Code plugin**, distributed through a
-single-plugin marketplace in this same repo. It carries one skill, also named
-`migaki`, whose entire job is to route an agent to the right taste reference at
-the right moment.
+ui-polish (formerly migaki, 磨き — "to polish") is a **Claude Code plugin**,
+distributed through a single-plugin marketplace in this same repo. It carries
+one skill, also named `ui-polish`, whose entire job is to route an agent to the
+right taste reference at the right moment.
 
 There is no server, no build step, no runtime, and no dependencies. The
 deliverable is markdown. An agent installs the plugin, and the skill's
@@ -15,20 +15,20 @@ layout, typography, or front-end components.
 ## Repo structure
 
 ```
-migaki/
+ui-polish/
 ├── CLAUDE.md
 ├── .claude-plugin/
-│   └── marketplace.json      # points at ./plugins/migaki
+│   └── marketplace.json      # points at ./plugins/ui-polish
 ├── research/                 # repo tooling; NOT shipped with the plugin
 │   ├── PROTOCOL.md           # operating contract for the research loop
 │   ├── SOURCES.md            # the only sources the loop may read
 │   └── REJECTED.md           # declined proposals; never re-proposed
 └── plugins/
-    └── migaki/
+    └── ui-polish/
         ├── .claude-plugin/
         │   └── plugin.json   # plugin manifest
         └── skills/
-            └── migaki/
+            └── ui-polish/
                 ├── SKILL.md  # router; frontmatter drives invocation
                 ├── core.md   # timeless perceptual principles
                 ├── slop.md   # what reads as AI-generated or dated
@@ -37,7 +37,7 @@ migaki/
 
 The plugin is six files, ~500 lines. Keep it that way unless there's a reason.
 `research/` is maintenance tooling, ships with nothing, and does not count
-against that budget — but it must never move under `plugins/migaki/`.
+against that budget — but it must never move under `plugins/ui-polish/`.
 
 ## The taste layer
 

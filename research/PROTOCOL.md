@@ -5,7 +5,7 @@ Operating contract for the scheduled agent that maintains `edge.md` and
 write to `main`.
 
 This directory is repo tooling and is **not** part of the shipped plugin.
-Nothing under `research/` may be moved into `plugins/migaki/`.
+Nothing under `research/` may be moved into `plugins/ui-polish/`.
 
 ## Scope
 
@@ -105,7 +105,7 @@ The loop runs as a scheduled cloud routine. Its prompt stays deliberately
 short so that changing how the loop behaves means editing this file, not
 re-registering the routine:
 
-> Run the migaki research loop. Read `research/PROTOCOL.md` and follow it
+> Run the ui-polish research loop. Read `research/PROTOCOL.md` and follow it
 > exactly. Draw only on sources listed in `research/SOURCES.md`. Never edit
 > `core.md` and never commit to `main`.
 

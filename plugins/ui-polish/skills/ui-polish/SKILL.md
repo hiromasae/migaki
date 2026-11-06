@@ -1,12 +1,12 @@
 ---
-name: migaki
+name: ui-polish
 description: Sense and taste guidance for producing work that reads as excellent rather than generic. Use when generating, reviewing, or revising UI, visual design, layout, typography, or front-end components. Routes to focused reference files on timeless principles, AI-slop patterns to avoid, and what reads as excellent right now.
 ---
 
-# migaki
+# ui-polish
 
-Migaki (磨き, "polish") is a set of sense and taste references for making
-output read as excellent rather than generic — sense being grounded in fact,
+ui-polish is a set of sense and taste references for making output read
+as excellent rather than generic — sense being grounded in fact,
 taste in preference. The guidance lives in three files in this
 directory. Open **only the file you need** for the task at hand — do not read
 all three by default.

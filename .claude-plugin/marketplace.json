@@ -1,13 +1,13 @@
 {
-  "name": "migaki",
+  "name": "ui-polish",
   "owner": {
     "name": "Hiro"
   },
-  "description": "A marketplace for the migaki sense-and-taste plugin.",
+  "description": "A marketplace for the ui-polish sense-and-taste plugin.",
   "plugins": [
     {
-      "name": "migaki",
-      "source": "./plugins/migaki"
+      "name": "ui-polish",
+      "source": "./plugins/ui-polish"
     }
   ]
 }

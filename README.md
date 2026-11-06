@@ -1,7 +1,7 @@
-# migaki
+# ui-polish
 
-migaki (磨き — "to polish") is a Claude Code plugin carrying one skill: a set
-of sense and taste references that push generated work toward reading as
+ui-polish (formerly migaki) is a Claude Code plugin carrying one skill: a
+set of sense and taste references that push generated work toward reading as
 excellent rather than generic. Sense is grounded in fact, taste in preference.
 
 No server, no build step, no dependencies. The deliverable is markdown.
@@ -9,8 +9,8 @@ No server, no build step, no dependencies. The deliverable is markdown.
 ## Install
 
 ```
-/plugin marketplace add hiromasae/migaki
-/plugin install migaki@migaki
+/plugin marketplace add hiromasae/ui-polish
+/plugin install ui-polish@ui-polish
 ```
 
 ## What it does
@@ -43,9 +43,9 @@ accept or reject one at a time.
 
 ```
 .claude-plugin/marketplace.json
-plugins/migaki/
+plugins/ui-polish/
 ├── .claude-plugin/plugin.json
-└── skills/migaki/
+└── skills/ui-polish/
     ├── SKILL.md
     ├── core.md
     ├── slop.md
